@@ -26,19 +26,17 @@ class AutocompleteInput extends Component {
       selected: 0
     };
 
-    this.performAutocomplete = this.performAutocomplete.bind(this);
-    this.getFromLastWord = this.getFromLastWord.bind(this);
-
-    this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
-    this.matchWithArray = this.matchWithArray.bind(this);
-
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClick = this.onClick.bind(this);
 
-    this.checkAutocomplete = this.checkAutocomplete.bind(this);
-    this.performNavigation = this.performNavigation.bind(this);
-
     this.setCurrentInput = this.setCurrentInput.bind(this);
+    this.performNavigation = this.performNavigation.bind(this);
+    this.performAutocomplete = this.performAutocomplete.bind(this);
+    this.checkAutocomplete = this.checkAutocomplete.bind(this);
+
+    this.getFromLastWord = this.getFromLastWord.bind(this);
+    this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
+    this.matchWithArray = this.matchWithArray.bind(this);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
@@ -48,16 +46,18 @@ class AutocompleteInput extends Component {
       event.target.value,
       event.target.selectionStart
     );
-    
+
     const autocompleteState = this.checkAutocomplete(s);
 
-    if(autocompleteState) {
-      (event.keyCode === KEY_DOWN || event.keyCode === KEY_UP || event.keyCode === KEY_ENTER) 
+    if (autocompleteState) {
+      event.keyCode === KEY_DOWN ||
+      event.keyCode === KEY_UP ||
+      event.keyCode === KEY_ENTER
         ? this.performNavigation(event)
         : this.performAutocomplete(event, s);
     } else {
       let newState = this.checkAutocomplete(s);
-      if(newState) {
+      if (newState) {
         this.performAutocomplete(event, s);
       } else {
         this.setCurrentInput(event);
@@ -164,7 +164,6 @@ class AutocompleteInput extends Component {
 
   getAutocompleteEnd(s) {
     const { autocompleteStart } = this.state;
-
     let i = autocompleteStart;
 
     while (s[i] !== " " && i < s.length) {
@@ -183,6 +182,7 @@ class AutocompleteInput extends Component {
     }
     return result;
   }
+
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
   componentDidUpdate() {
