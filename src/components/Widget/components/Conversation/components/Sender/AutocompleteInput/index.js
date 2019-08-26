@@ -34,66 +34,33 @@ class AutocompleteInput extends Component {
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClick = this.onClick.bind(this);
+
+    this.checkAutocomplete = this.checkAutocomplete.bind(this);
+    this.performNavigation = this.performNavigation.bind(this);
+
+    this.setCurrentInput = this.setCurrentInput.bind(this);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
 
-  onInput(event) {
+  onKeyDown(event) {
     const s = this.getFromLastWord(
       event.target.value,
       event.target.selectionStart
     );
+    
+    const autocompleteState = this.checkAutocomplete(s);
 
-    const i = s.indexOf("@");
-    if (i === -1) {
-      this.setState({
-        currentInput: event.target.value,
-        autocompleteState: false
-      });
-      return;
-    }
-
-    const pattern = s.substr(i + 1);
-    const matchingWords = this.performAutocomplete(pattern);
-
-    this.setState({
-      currentInput: event.target.value,
-      autocompleteState: true,
-      autocompleteStart: event.target.value.indexOf("@"),
-      autocompleteEnd: event.target.selectionStart - 1,
-      autocompleteList: matchingWords
-    });
-  }
-
-  onKeyDown(event) {
-    const { autocompleteState, autocompleteList, selected } = this.state;
-
-    if (autocompleteState) {
-      switch (event.keyCode) {
-        case KEY_UP:
-          event.preventDefault();
-          this.setState(prevState => ({
-            selected:
-              prevState.selected === 0
-                ? autocompleteList.length - 1
-                : prevState.selected - 1
-          }));
-          return;
-
-        case KEY_DOWN:
-          event.preventDefault();
-          this.setState(prevState => ({
-            selected: (prevState.selected + 1) % autocompleteList.length
-          }));
-          return;
-
-        case KEY_ENTER:
-          event.preventDefault();
-          this.onClick(selected);
-          return;
-
-        default:
-          return;
+    if(autocompleteState) {
+      (event.keyCode === KEY_DOWN || event.keyCode === KEY_UP || event.keyCode === KEY_ENTER) 
+        ? this.performNavigation(event)
+        : this.performAutocomplete(event, s);
+    } else {
+      let newState = this.checkAutocomplete(s);
+      if(newState) {
+        this.performAutocomplete(event, s);
+      } else {
+        this.setCurrentInput(event);
       }
     }
   }
@@ -117,6 +84,66 @@ class AutocompleteInput extends Component {
       autocompleteState: false,
       selected: 0
     });
+  }
+
+  /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
+
+  setCurrentInput(event) {
+    this.setState({
+      currentInput: event.target.value,
+      autocompleteState: false
+    });
+  }
+
+  performNavigation(event) {
+    const { autocompleteList, selected } = this.state;
+
+    switch (event.keyCode) {
+      case KEY_UP:
+        event.preventDefault();
+        this.setState(prevState => ({
+          selected:
+            prevState.selected === 0
+              ? autocompleteList.length - 1
+              : prevState.selected - 1
+        }));
+        return;
+
+      case KEY_DOWN:
+        event.preventDefault();
+        this.setState(prevState => ({
+          selected: (prevState.selected + 1) % autocompleteList.length
+        }));
+        return;
+
+      case KEY_ENTER:
+        event.preventDefault();
+        this.onClick(selected);
+        return;
+
+      default:
+        return;
+    }
+  }
+
+  performAutocomplete(event, s) {
+    const i = s.indexOf("@");
+    const pattern = s.substr(i + 1);
+    const { dataList } = this.state;
+    const matchingWords = this.matchWithArray(pattern, dataList);
+
+    this.setState({
+      currentInput: event.target.value,
+      autocompleteState: true,
+      autocompleteStart: event.target.value.indexOf("@"),
+      autocompleteEnd: event.target.selectionStart - 1,
+      autocompleteList: matchingWords
+    });
+  }
+
+  checkAutocomplete(s) {
+    const i = s.indexOf("@");
+    return !(i === -1);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Helper functions >>>>>>>>>>>>>>>>>>>> */
@@ -145,13 +172,6 @@ class AutocompleteInput extends Component {
     }
 
     return i;
-  }
-
-  performAutocomplete(pattern) {
-    const { dataList } = this.state;
-    let matchingWords = this.matchWithArray(pattern, dataList);
-
-    return matchingWords;
   }
 
   matchWithArray(pattern, dataList) {
@@ -198,7 +218,7 @@ class AutocompleteInput extends Component {
                   disabled={disabledInput}
                   autoFocus
                   autoComplete="off"
-                  onChange={this.onInput.bind(this)}
+                  onChange={this.onKeyDown} //.bind(this)
                   onKeyDown={this.onKeyDown}
                   value={currentInput}
                 />
