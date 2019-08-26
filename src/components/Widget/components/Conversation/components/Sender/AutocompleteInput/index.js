@@ -188,7 +188,7 @@ class AutocompleteInput extends Component {
   componentDidUpdate() {
     if (this.activeItem) {
       this.activeItem.scrollIntoView({
-        block: "start"
+        block: "nearest"
       });
     }
   }
