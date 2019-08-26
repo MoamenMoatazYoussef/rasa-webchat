@@ -58,7 +58,6 @@ class AutocompleteInput extends Component {
 
     this.setState({
       currentInput: event.target.value,
-
       autocompleteState: true,
       autocompleteStart: event.target.value.indexOf("@"),
       autocompleteEnd: event.target.selectionStart - 1,
@@ -70,27 +69,32 @@ class AutocompleteInput extends Component {
     const { autocompleteState, autocompleteList, selected } = this.state;
 
     if (autocompleteState) {
-      if (event.keyCode === KEY_UP && selected <= autocompleteList.length - 1) {
-        event.preventDefault();
+      switch (event.keyCode) {
+        case KEY_UP:
+          event.preventDefault();
+          this.setState(prevState => ({
+            selected:
+              prevState.selected === 0
+                ? autocompleteList.length - 1
+                : prevState.selected - 1
+          }));
+          return;
 
-        this.setState(prevState => ({
-          selected:
-            prevState.selected === 0
-              ? autocompleteList.length - 1
-              : prevState.selected - 1
-        }));
-      } else if (event.keyCode === KEY_DOWN && selected >= 0) {
-        event.preventDefault();
+        case KEY_DOWN:
+          event.preventDefault();
+          this.setState(prevState => ({
+            selected: (prevState.selected + 1) % autocompleteList.length
+          }));
+          return;
 
-        this.setState(prevState => ({
-          selected: (prevState.selected + 1) % autocompleteList.length
-        }));
-      } else if (event.keyCode === KEY_ENTER) {
-        event.preventDefault();
-        this.onClick(selected);
+        case KEY_ENTER:
+          event.preventDefault();
+          this.onClick(selected);
+          return;
+
+        default:
+          return;
       }
-
-      return;
     }
   }
 
@@ -179,7 +183,7 @@ class AutocompleteInput extends Component {
     } = this.state;
 
     return (
-      <div className="z-index-10">
+      <div>
         <Manager tag={true}>
           <div className="position-relative">
             <Reference>
@@ -204,7 +208,7 @@ class AutocompleteInput extends Component {
             {autocompleteState && (
               <Popper
                 eventsEnabled={true}
-                placement="top"
+                placement="top-end"
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
@@ -212,7 +216,7 @@ class AutocompleteInput extends Component {
                     <div
                       ref={ref}
                       style={style}
-                      className="custom-popper w-100 "
+                      className="custom-popper"
                       data-placement={placement}
                     >
                       {autocompleteList.map((item, i) => (
