@@ -13,4 +13,4 @@ lib
 coverage
 
 # User files
-src/resources
+src/resources/
