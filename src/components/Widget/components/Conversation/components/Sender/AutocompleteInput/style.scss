@@ -1,3 +1,5 @@
+// <<<<<<<<<< specifics >>>>>>>>>>
+
 .custom-popper {
     padding: 1% 1% 1% 1%;
     border-radius: 10px;
@@ -8,13 +10,13 @@
     max-height: 380%;
 }
 
-.padding-left {
-    padding-left: 100px;
+.selected-element {
+    background: rgb(170, 195, 250);
+    color: white;
+    font-style: bold;
 }
 
-.w-100 {
-    width: 100%;
-}
+// <<<<<<<<<< generics >>>>>>>>>>
 
 .position-relative {
     position: relative;
@@ -22,10 +24,4 @@
 
 .z-index-10 {
     z-index: 10;
-}
-
-.selected-element {
-    background: rgb(170, 195, 250);
-    color: white;
-    font-style: bold;
 }

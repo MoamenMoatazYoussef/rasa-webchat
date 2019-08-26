@@ -204,7 +204,7 @@ class AutocompleteInput extends Component {
             {autocompleteState && (
               <Popper
                 eventsEnabled={true}
-                placement="top"
+                placement="top-end"
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
@@ -212,7 +212,7 @@ class AutocompleteInput extends Component {
                     <div
                       ref={ref}
                       style={style}
-                      className="custom-popper w-100 "
+                      className="custom-popper"
                       data-placement={placement}
                     >
                       {autocompleteList.map((item, i) => (
