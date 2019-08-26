@@ -1,0 +1,31 @@
+.custom-popper {
+    padding: 1% 1% 1% 1%;
+    border-radius: 10px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-color: rgb(236, 242, 255);
+
+    max-height: 380%;
+}
+
+.padding-left {
+    padding-left: 100px;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.z-index-10 {
+    z-index: 10;
+}
+
+.selected-element {
+    background: rgb(170, 195, 250);
+    color: white;
+    font-style: bold;
+}

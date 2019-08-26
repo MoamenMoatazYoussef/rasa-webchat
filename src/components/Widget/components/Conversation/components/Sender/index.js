@@ -1,20 +1,28 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-import send from 'assets/send_button.svg';
-import './style.scss';
+import AutocompleteInput from "./AutocompleteInput";
 
-const Sender = ({ sendMessage, inputFieldTextHint, disabledInput }) =>
+import send from "assets/send_button.svg";
+import "./style.scss";
+
+const Sender = ({ sendMessage, inputFieldTextHint, disabledInput }) => (
   <form className="sender" onSubmit={sendMessage}>
-    <input type="text" className="new-message" name="message" placeholder={inputFieldTextHint} disabled={disabledInput} autoFocus autoComplete="off" />
+    <AutocompleteInput
+      inputFieldTextHint={inputFieldTextHint}
+      disabledInput={disabledInput}
+      autoFocus
+      autoComplete="off"
+    />
     <button type="submit" className="send">
       <img src={send} className="send-icon" alt="send" />
     </button>
-  </form>;
+  </form>
+);
 
 const mapStateToProps = state => ({
-  inputFieldTextHint: state.behavior.get('inputFieldTextHint')
+  inputFieldTextHint: state.behavior.get("inputFieldTextHint")
 });
 
 Sender.propTypes = {
