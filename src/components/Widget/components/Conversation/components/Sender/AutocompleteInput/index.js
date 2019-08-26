@@ -188,10 +188,11 @@ class AutocompleteInput extends Component {
   componentDidUpdate() {
     if (this.activeItem) {
       this.activeItem.scrollIntoView({
-        block: "start"
+        block: "nearest"
       });
     }
   }
+
 
   render() {
     const { inputFieldTextHint, disabledInput } = this.props;
@@ -199,14 +200,16 @@ class AutocompleteInput extends Component {
       autocompleteState,
       autocompleteList,
       selected,
-      currentInput
+      currentInput,
+      pageStart,
+      pageEnd
     } = this.state;
 
     return (
-      <div>
+      <div className=" w-100">
         <Manager tag={true}>
           <div className="position-relative">
-            <Reference>
+            <Reference >
               {({ ref }) => (
                 <input
                   ref={ref}
@@ -227,11 +230,30 @@ class AutocompleteInput extends Component {
 
             {autocompleteState && (
               <Popper
+                ref={popper => (this.popper = popper)}
                 eventsEnabled={true}
-                placement="top-end"
+                placement="auto-start"
+                modifiers={{
+                  preventOverflow: {
+                    boundariesElement: this
+                  },
+                  keepTogether: {
+                    order: 100,
+                    enabled: true,
+                  },
+                  inner: {
+                    // enabled: true
+                  },
+                  computeStyle: {
+                    gpuAcceleration: false,
+                    x: "'top'"
+
+                  }
+                }}
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
+                  // console.log(arrowProps);
                   return (
                     <div
                       ref={ref}
@@ -239,21 +261,23 @@ class AutocompleteInput extends Component {
                       className="custom-popper"
                       data-placement={placement}
                     >
-                      {autocompleteList.map((item, i) => (
-                        <div
-                          key={i}
-                          ref={
-                            selected === i
-                              ? div => (this.activeItem = div)
-                              : null
-                          }
-                          className={selected === i ? "selected-element" : ""}
-                          onClick={() => this.onClick(i)}
-                        >
-                          {item.displayName}
-                        </div>
-                      ))}
-                      <div ref={arrowProps.ref} style={arrowProps.style} />
+                      {autocompleteList
+                        .slice(pageStart, pageEnd)
+                        .map((item, i) => (
+                          <div
+                            key={i}
+                            ref={
+                              selected === i
+                                ? div => (this.activeItem = div)
+                                : null
+                            }
+                            className={selected === i ? "element selected-element" : "element"}
+                            onClick={() => this.onClick(i)}
+                          >
+                            {item.displayName}
+                          </div>
+                        ))}
+                      {/* <div ref={arrowProps.ref} style={arrowProps.style} /> */}
                     </div>
                   );
                 }}
@@ -264,6 +288,5 @@ class AutocompleteInput extends Component {
       </div>
     );
   }
-}
 
 export default AutocompleteInput;
