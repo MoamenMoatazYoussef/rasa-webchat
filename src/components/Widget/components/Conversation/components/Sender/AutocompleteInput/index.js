@@ -6,9 +6,11 @@ import "./style.scss";
 
 //TODO: remove this after finishing
 const contacts = require("../../../../../../../resources/accounts.json");
+
 const KEY_DOWN = 40;
 const KEY_UP = 38;
 const KEY_ENTER = 13;
+const PAGE_SIZE = 10;
 
 class AutocompleteInput extends Component {
   constructor(props) {
@@ -23,7 +25,10 @@ class AutocompleteInput extends Component {
       autocompleteEnd: 0,
       autocompleteState: false,
 
-      selected: 0
+      selected: 0,
+      pageStart: 0,
+      pageEnd: PAGE_SIZE,
+
     };
 
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -37,6 +42,10 @@ class AutocompleteInput extends Component {
     this.getFromLastWord = this.getFromLastWord.bind(this);
     this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
     this.matchWithArray = this.matchWithArray.bind(this);
+
+    this.swapPageDown = this.swapPageDown.bind(this);
+    this.swapPageUp = this.swapPageUp.bind(this);
+    this.resetPages = this.resetPages.bind(this);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
@@ -96,7 +105,7 @@ class AutocompleteInput extends Component {
   }
 
   performNavigation(event) {
-    const { autocompleteList, selected } = this.state;
+    const { autocompleteList, selected, pageStart, pageEnd } = this.state;
 
     switch (event.keyCode) {
       case KEY_UP:
@@ -104,16 +113,29 @@ class AutocompleteInput extends Component {
         this.setState(prevState => ({
           selected:
             prevState.selected === 0
-              ? autocompleteList.length - 1
+              ? (() => {
+                  this.swapPageUp(autocompleteList.length);
+                  return pageEnd - pageStart - 1;
+                })()
               : prevState.selected - 1
         }));
+
+        console.log(pageStart, pageEnd, selected);
         return;
 
       case KEY_DOWN:
         event.preventDefault();
         this.setState(prevState => ({
-          selected: (prevState.selected + 1) % autocompleteList.length
+          selected:
+            prevState.selected === pageEnd - pageStart - 1
+              ? (() => {
+                  this.swapPageDown(autocompleteList.length);
+                  return 0;
+                })()
+              : prevState.selected + 1
         }));
+
+        console.log(pageStart, pageEnd, selected);
         return;
 
       case KEY_ENTER:
@@ -126,18 +148,69 @@ class AutocompleteInput extends Component {
     }
   }
 
+  swapPageDown(listLength) {
+    //i.e. they will increase
+    let { pageStart, pageEnd } = this.state;
+
+    pageEnd =
+      pageEnd + PAGE_SIZE >= listLength //will increasing the end overflow?
+        ? PAGE_SIZE //yes: then restart
+        : pageEnd + PAGE_SIZE; //no, then proceed
+    pageStart =
+      pageStart >= pageEnd //did end overflow and restart?
+        ? 0 //yes, then restart
+        : pageStart + PAGE_SIZE; //no, then proceed
+
+    this.setState({
+      pageStart,
+      pageEnd
+    });
+  }
+
+  swapPageUp(listLength) {
+    //i.e. they will decrease
+    let { pageStart, pageEnd } = this.state;
+
+    pageStart =
+      pageStart - PAGE_SIZE < 0 //will decreasing the start overflow?
+        ? listLength - PAGE_SIZE //yes, then restart from top
+        : pageStart - PAGE_SIZE; //no, then proceed
+    pageEnd =
+      pageEnd < pageStart //did start overflow and restart from the top
+        ? autocompleteListSize //yes, then restart from the top
+        : pageEnd - PAGE_SIZE; //no, then proceed
+
+    this.setState({
+      pageStart,
+      pageEnd
+    });
+  }
+
+  resetPages(listLength) {
+    this.setState({
+      selected: 0,
+      pageStart: 0,
+      pageEnd: PAGE_SIZE < listLength ? PAGE_SIZE : listLength
+    });
+  }
+
   performAutocomplete(event, s) {
     const i = s.indexOf("@");
     const pattern = s.substr(i + 1);
     const { dataList } = this.state;
     const matchingWords = this.matchWithArray(pattern, dataList);
 
+    this.resetPages(matchingWords.length);
+
     this.setState({
       currentInput: event.target.value,
+
       autocompleteState: true,
       autocompleteStart: event.target.value.indexOf("@"),
       autocompleteEnd: event.target.selectionStart - 1,
       autocompleteList: matchingWords
+
+
     });
   }
 
@@ -199,7 +272,9 @@ class AutocompleteInput extends Component {
       autocompleteState,
       autocompleteList,
       selected,
-      currentInput
+      currentInput,
+      pageStart,
+      pageEnd
     } = this.state;
 
     return (
@@ -239,20 +314,22 @@ class AutocompleteInput extends Component {
                       className="custom-popper"
                       data-placement={placement}
                     >
-                      {autocompleteList.map((item, i) => (
-                        <div
-                          key={i}
-                          ref={
-                            selected === i
-                              ? div => (this.activeItem = div)
-                              : null
-                          }
-                          className={selected === i ? "selected-element" : ""}
-                          onClick={() => this.onClick(i)}
-                        >
-                          {item.displayName}
-                        </div>
-                      ))}
+                      {autocompleteList
+                        .slice(pageStart, pageEnd)
+                        .map((item, i) => (
+                          <div
+                            key={i}
+                            ref={
+                              selected === i
+                                ? div => (this.activeItem = div)
+                                : null
+                            }
+                            className={selected === i ? "selected-element" : ""}
+                            onClick={() => this.onClick(i)}
+                          >
+                            {item.displayName}
+                          </div>
+                        ))}
                       <div ref={arrowProps.ref} style={arrowProps.style} />
                     </div>
                   );
