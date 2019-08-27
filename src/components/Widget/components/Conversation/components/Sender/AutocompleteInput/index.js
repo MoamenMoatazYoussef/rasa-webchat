@@ -224,12 +224,16 @@ class AutocompleteInput extends Component {
     let noOfSpaces = 0;
     let indexOfLastWord = 0;
 
-    for (let i = cursorPosition; i >= 0 && noOfSpaces <= 2; i--) {
+    let i;
+
+    for (i = cursorPosition; i >= 0 && noOfSpaces <= 2; i--) {
       if (s[i] === " ") {
         noOfSpaces++;
         indexOfLastWord = i;
       }
     }
+    
+    indexOfLastWord = noOfSpaces === 2 ? indexOfLastWord : 0;
 
     return s.substring(indexOfLastWord, cursorPosition);
   }
