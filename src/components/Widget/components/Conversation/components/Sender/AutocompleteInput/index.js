@@ -303,6 +303,18 @@ class AutocompleteInput extends Component {
               <Popper
                 eventsEnabled={true}
                 placement="top-end"
+                // modifiers={{ preventOverflow: { enabled: false } }}
+                modifiers={{
+                  flip: {
+                    behavior: ["left", "right", "bottom", "top"]
+                  },
+                  preventOverflow: {
+                    boundariesElement: this
+                  },
+                  keepTogether: {
+                    
+                  }
+                }}
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
