@@ -149,17 +149,17 @@ class AutocompleteInput extends Component {
   }
 
   swapPageDown(listLength) {
-    //i.e. they will increase
     let { pageStart, pageEnd } = this.state;
 
     pageEnd =
-      pageEnd + PAGE_SIZE >= listLength //will increasing the end overflow?
-        ? PAGE_SIZE //yes: then restart
-        : pageEnd + PAGE_SIZE; //no, then proceed
+      pageEnd + PAGE_SIZE >= listLength
+        ? (PAGE_SIZE > listLength ? listLength : PAGE_SIZE)
+        : pageEnd + PAGE_SIZE;
+
     pageStart =
-      pageStart >= pageEnd //did end overflow and restart?
-        ? 0 //yes, then restart
-        : pageStart + PAGE_SIZE; //no, then proceed
+      pageStart >= pageEnd
+        ? 0
+        : (PAGE_SIZE > listLength ? 0 : pageStart + PAGE_SIZE);
 
     this.setState({
       pageStart,
@@ -168,17 +168,16 @@ class AutocompleteInput extends Component {
   }
 
   swapPageUp(listLength) {
-    //i.e. they will decrease
     let { pageStart, pageEnd } = this.state;
 
     pageStart =
-      pageStart - PAGE_SIZE < 0 //will decreasing the start overflow?
-        ? listLength - PAGE_SIZE //yes, then restart from top
-        : pageStart - PAGE_SIZE; //no, then proceed
+      pageStart - PAGE_SIZE < 0
+        ? (PAGE_SIZE > listLength ? 0 : listLength - PAGE_SIZE)
+        : pageStart - PAGE_SIZE;
     pageEnd =
-      pageEnd < pageStart //did start overflow and restart from the top
-        ? autocompleteListSize //yes, then restart from the top
-        : pageEnd - PAGE_SIZE; //no, then proceed
+      pageEnd < pageStart
+        ? listLength
+        : (PAGE_SIZE > listLength ? listLength : pageEnd - PAGE_SIZE);
 
     this.setState({
       pageStart,
