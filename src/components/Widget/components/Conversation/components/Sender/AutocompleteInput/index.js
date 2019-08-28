@@ -288,5 +288,6 @@ class AutocompleteInput extends Component {
       </div>
     );
   }
+}
 
 export default AutocompleteInput;
