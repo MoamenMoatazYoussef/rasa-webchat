@@ -8,16 +8,20 @@
     overflow-y: hidden;
     background-color: white;
 
-    // max-height: 380%;
+    max-height: 500%;
+    width: 100%;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }
 
 .element {
     background-color: white;
     // color: #000099;
-    padding-left: 2%;
-    padding-right: 2%;
-    padding-top: 2%;
-    padding-bottom: 2%;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .selected-element {
@@ -39,3 +43,23 @@
 .w-100 {
     width: 100%;
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #000099; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #000077; 
+  }
