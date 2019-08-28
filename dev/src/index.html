@@ -9,7 +9,22 @@
 
 <script src="../../index.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+WebChat.default.init({
+    selector: "#webchat",
+    initPayload: "/get_started",
+    interval: 1000, // 1000 ms between each message
+    customData: {"sender": "django"}, // arbitrary custom data. Stay minimal as this will be added to the socket
+    socketUrl: "http://10.10.19.56:5500/",
+    title: "Meeting Room Reservation Bot",
+    // <!--subtitle: "The bot which reserves meeting rooms",-->
+    profileAvatar: "https://rasa.com/assets/img/demo/rasa_avatar.png",
+    // profileAvatar: "../../static/itworx.jpg",
+    showCloseButton: true,
+    fullScreenMode: false
+});
 </script>
+
 </body>
 
 </html>

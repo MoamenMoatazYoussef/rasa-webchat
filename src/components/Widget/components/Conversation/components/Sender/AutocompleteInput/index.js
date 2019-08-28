@@ -120,7 +120,6 @@ class AutocompleteInput extends Component {
               : prevState.selected - 1
         }));
 
-        console.log(pageStart, pageEnd, selected);
         return;
 
       case KEY_DOWN:
@@ -135,7 +134,6 @@ class AutocompleteInput extends Component {
               : prevState.selected + 1
         }));
 
-        console.log(pageStart, pageEnd, selected);
         return;
 
       case KEY_ENTER:
@@ -267,6 +265,9 @@ class AutocompleteInput extends Component {
         block: "nearest"
       });
     }
+
+    // this.popper.update();
+
   }
 
   render() {
@@ -281,10 +282,10 @@ class AutocompleteInput extends Component {
     } = this.state;
 
     return (
-      <div>
+      <div className=" w-100">
         <Manager tag={true}>
           <div className="position-relative">
-            <Reference>
+            <Reference >
               {({ ref }) => (
                 <input
                   ref={ref}
@@ -305,23 +306,30 @@ class AutocompleteInput extends Component {
 
             {autocompleteState && (
               <Popper
+                ref={popper => (this.popper = popper)}
                 eventsEnabled={true}
-                placement="top-end"
-                // modifiers={{ preventOverflow: { enabled: false } }}
+                placement="auto-start"
                 modifiers={{
-                  flip: {
-                    behavior: ["left", "right", "bottom", "top"]
-                  },
                   preventOverflow: {
                     boundariesElement: this
                   },
                   keepTogether: {
-                    
+                    order: 100,
+                    enabled: true,
+                  },
+                  inner: {
+                    // enabled: true
+                  },
+                  computeStyle: {
+                    gpuAcceleration: false,
+                    x: "'top'"
+
                   }
                 }}
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
+                  // console.log(arrowProps);
                   return (
                     <div
                       ref={ref}
@@ -339,13 +347,13 @@ class AutocompleteInput extends Component {
                                 ? div => (this.activeItem = div)
                                 : null
                             }
-                            className={selected === i ? "selected-element" : ""}
+                            className={selected === i ? "element selected-element" : "element"}
                             onClick={() => this.onClick(i)}
                           >
                             {item.displayName}
                           </div>
                         ))}
-                      <div ref={arrowProps.ref} style={arrowProps.style} />
+                      {/* <div ref={arrowProps.ref} style={arrowProps.style} /> */}
                     </div>
                   );
                 }}
