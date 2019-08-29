@@ -1,16 +1,17 @@
 import React, { Component } from "react";
 import { Manager, Reference, Popper } from "react-popper";
-import axios from 'axios';
+import axios from "axios";
 
 import "../style.scss";
 import "./style.scss";
 
 //TODO: remove this after finishing
-
 const contacts = require("../../../../../../../resources/accounts.json");
+
 const KEY_DOWN = 40;
 const KEY_UP = 38;
 const KEY_ENTER = 13;
+const KEY_DELETE = 8;
 
 class AutocompleteInput extends Component {
   constructor(props) {
@@ -28,6 +29,9 @@ class AutocompleteInput extends Component {
 
       selected: 0
     };
+
+    this.startTag = "\f";
+    this.endTag = "\0";
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -47,6 +51,12 @@ class AutocompleteInput extends Component {
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
 
   onKeyDown(event) {
+    if (event.keyCode === KEY_DELETE) {
+      event.target.value = this.onDelete(event);
+      this.setCurrentInput(event);
+      return;
+    }
+
     const s = this.getFromLastWord(
       event.target.value,
       event.target.selectionStart
@@ -61,10 +71,6 @@ class AutocompleteInput extends Component {
         ? this.performNavigation(event)
         : this.performAutocomplete(event, s);
     } else {
-      // let newState = this.checkAutocomplete(s);
-      // if (newState) {
-      // this.performAutocomplete(event, s);
-      // } else {
       if (event.keyCode === KEY_ENTER) {
         this.onSubmit(event);
       } else {
@@ -73,7 +79,7 @@ class AutocompleteInput extends Component {
     }
   }
 
-  onClick(i) {
+  onClick(i, cursorPosition, event) {
     const {
       autocompleteList,
       autocompleteStart,
@@ -82,11 +88,16 @@ class AutocompleteInput extends Component {
     } = this.state;
     const selectedOption = autocompleteList[i];
 
-    const autocompleteEnd = this.getAutocompleteEnd(currentInput);
+    const autocompleteEnd = //TODO: this is a bug fix tryout
+      this.getAutocompleteEnd(currentInput) < cursorPosition
+        ? cursorPosition
+        : this.getAutocompleteEnd(currentInput);
 
     const newInput =
       currentInput.substring(0, autocompleteStart) +
+      this.startTag +
       selectedOption.displayName +
+      this.endTag +
       currentInput.substr(autocompleteEnd);
 
     this.setState({
@@ -108,6 +119,69 @@ class AutocompleteInput extends Component {
 
   onSubmit(event) {
     event.target.mailInput = this.replaceNamesWithMails(event);
+  }
+
+  onDelete(event) {
+    let state = this.whereAmI(event.target.value, event.target.selectionStart);
+    switch (state) {
+      default:
+      case "normal":
+        return event.target.value;
+      case "tag":
+        let tagPosition, newInput;
+        try {
+          tagPosition = this.getTagPosition(
+            event.target.value,
+            event.target.selectionStart
+          );
+          newInput = this.deleteName(
+            event.target.value,
+            tagPosition.start,
+            tagPosition.end
+          );
+        } catch (e) {
+          console.log(e);
+          newInput = event.target.value;
+        }
+        return newInput;
+    }
+  }
+
+  whereAmI(input, start) {
+    for (let i = start; i < input.length - this.startTag.length + 1; i++) {
+      if (input.substr(i, this.startTag.length) === this.startTag) {
+        return "normal";
+      } else if (input.substr(i, this.endTag.length) === this.endTag) {
+        return "tag";
+      }
+    }
+    return "normal";
+  }
+
+  getTagPosition(input, start) {
+    let startTagPosition, endTagPosition;
+    for (let i = start; i < input.length; i++) {
+      if (input.substr(i, this.endTag.length) === this.endTag) {
+        endTagPosition = i + this.endTag.length - 1;
+        break;
+      }
+    }
+
+    for (let i = start; i >= 0; i--) {
+      if (input.substr(i, this.startTag.length) === this.startTag) {
+        startTagPosition = i;
+        break;
+      }
+    }
+
+    return {
+      start: startTagPosition,
+      end: endTagPosition
+    };
+  }
+
+  deleteName(input, start, end) {
+    return input.substring(0, start) + input.substr(end + 1);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
@@ -142,7 +216,7 @@ class AutocompleteInput extends Component {
 
       case KEY_ENTER:
         event.preventDefault();
-        this.onClick(selected);
+        this.onClick(selected, event.target.selectionStart, event);
         return;
 
       default:
@@ -244,9 +318,7 @@ class AutocompleteInput extends Component {
     // .then(res => res.json())
     // .then(data => dataList = data)
     // .catch(error => console.log(error));
-
     // dataList = require(this.props.contactsPath);
-
     // console.log(dataList);
     // this.setState({
     //   dataList
@@ -310,7 +382,7 @@ class AutocompleteInput extends Component {
                     enabled: true
                   },
                   inner: {
-                    // enabled: true
+                    
                   },
                   computeStyle: {
                     gpuAcceleration: false,
@@ -320,7 +392,6 @@ class AutocompleteInput extends Component {
                 style={{ opacity: 1 }}
               >
                 {({ ref, style, placement, arrowProps }) => {
-                  // console.log(arrowProps);
                   return (
                     <div
                       ref={ref}
@@ -348,7 +419,6 @@ class AutocompleteInput extends Component {
                             {item.displayName}
                           </div>
                         ))}
-                      {/* <div ref={arrowProps.ref} style={arrowProps.style} /> */}
                     </div>
                   );
                 }}
