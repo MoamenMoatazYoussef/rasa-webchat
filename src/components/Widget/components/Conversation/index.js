@@ -25,6 +25,7 @@ const Conversation = props =>
     <Sender
       sendMessage={props.sendMessage}
       disabledInput={props.disabledInput}
+      contactsPath={props.contactsPath}
     />
   </div>;
 

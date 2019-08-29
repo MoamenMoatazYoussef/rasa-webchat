@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { Manager, Reference, Popper } from "react-popper";
+import axios from 'axios';
 
 import "../style.scss";
 import "./style.scss";
 
 //TODO: remove this after finishing
+
 const contacts = require("../../../../../../../resources/accounts.json");
 const KEY_DOWN = 40;
 const KEY_UP = 38;
@@ -16,6 +18,7 @@ class AutocompleteInput extends Component {
 
     this.state = {
       currentInput: "",
+      mailPositions: [],
       dataList: contacts,
 
       autocompleteList: [],
@@ -28,6 +31,7 @@ class AutocompleteInput extends Component {
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
 
     this.setCurrentInput = this.setCurrentInput.bind(this);
     this.performNavigation = this.performNavigation.bind(this);
@@ -37,6 +41,7 @@ class AutocompleteInput extends Component {
     this.getFromLastWord = this.getFromLastWord.bind(this);
     this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
     this.matchWithArray = this.matchWithArray.bind(this);
+    this.replaceNamesWithMails = this.replaceNamesWithMails.bind(this);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
@@ -56,9 +61,12 @@ class AutocompleteInput extends Component {
         ? this.performNavigation(event)
         : this.performAutocomplete(event, s);
     } else {
-      let newState = this.checkAutocomplete(s);
-      if (newState) {
-        this.performAutocomplete(event, s);
+      // let newState = this.checkAutocomplete(s);
+      // if (newState) {
+      // this.performAutocomplete(event, s);
+      // } else {
+      if (event.keyCode === KEY_ENTER) {
+        this.onSubmit(event);
       } else {
         this.setCurrentInput(event);
       }
@@ -66,7 +74,12 @@ class AutocompleteInput extends Component {
   }
 
   onClick(i) {
-    const { autocompleteList, autocompleteStart, currentInput } = this.state;
+    const {
+      autocompleteList,
+      autocompleteStart,
+      currentInput,
+      mailPositions
+    } = this.state;
     const selectedOption = autocompleteList[i];
 
     const autocompleteEnd = this.getAutocompleteEnd(currentInput);
@@ -78,12 +91,23 @@ class AutocompleteInput extends Component {
 
     this.setState({
       currentInput: newInput,
+      mailPositions: [
+        ...mailPositions,
+        {
+          mail: selectedOption.mail,
+          name: selectedOption.displayName
+        }
+      ],
       autocompleteList: [],
       autocompleteStart: 0,
       autocompleteEnd: 0,
       autocompleteState: false,
       selected: 0
     });
+  }
+
+  onSubmit(event) {
+    event.target.mailInput = this.replaceNamesWithMails(event);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
@@ -183,7 +207,51 @@ class AutocompleteInput extends Component {
     return result;
   }
 
+  replaceNamesWithMails(event) {
+    let input = event.target.value;
+    let result = input;
+    const { mailPositions } = this.state;
+
+    if (!mailPositions.length) {
+      return input;
+    }
+
+    for (let i = 0; i < mailPositions.length; i++) {
+      result = result.replace(mailPositions[i].name, mailPositions[i].mail);
+    }
+
+    return result;
+  }
+
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
+
+  componentDidMount() {
+    // axios.get(this.props.contactsPath) // JSON File Path
+    //   .then(response => {
+    //     this.setState({
+    //       dataList: response.data
+    //     });
+    //   })
+    //   .catch(function(error) {
+    //     console.log(error);
+    //     this.setState({
+    //       dataList: contacts
+    //     });
+    //   });
+
+    // let dataList = {};
+    // fetch(this.props.contactsPath)
+    // .then(res => res.json())
+    // .then(data => dataList = data)
+    // .catch(error => console.log(error));
+
+    // dataList = require(this.props.contactsPath);
+
+    // console.log(dataList);
+    // this.setState({
+    //   dataList
+    // });
+  }
 
   componentDidUpdate() {
     if (this.activeItem) {
@@ -192,7 +260,6 @@ class AutocompleteInput extends Component {
       });
     }
   }
-
 
   render() {
     const { inputFieldTextHint, disabledInput } = this.props;
@@ -209,7 +276,7 @@ class AutocompleteInput extends Component {
       <div className=" w-100">
         <Manager tag={true}>
           <div className="position-relative">
-            <Reference >
+            <Reference>
               {({ ref }) => (
                 <input
                   ref={ref}
@@ -223,6 +290,7 @@ class AutocompleteInput extends Component {
                   autoComplete="off"
                   onChange={this.onKeyDown} //.bind(this)
                   onKeyDown={this.onKeyDown}
+                  onSubmit={() => this.onSubmit(this)}
                   value={currentInput}
                 />
               )}
@@ -239,7 +307,7 @@ class AutocompleteInput extends Component {
                   },
                   keepTogether: {
                     order: 100,
-                    enabled: true,
+                    enabled: true
                   },
                   inner: {
                     // enabled: true
@@ -247,7 +315,6 @@ class AutocompleteInput extends Component {
                   computeStyle: {
                     gpuAcceleration: false,
                     x: "'top'"
-
                   }
                 }}
                 style={{ opacity: 1 }}
@@ -271,7 +338,11 @@ class AutocompleteInput extends Component {
                                 ? div => (this.activeItem = div)
                                 : null
                             }
-                            className={selected === i ? "element selected-element" : "element"}
+                            className={
+                              selected === i
+                                ? "element selected-element"
+                                : "element"
+                            }
                             onClick={() => this.onClick(i)}
                           >
                             {item.displayName}

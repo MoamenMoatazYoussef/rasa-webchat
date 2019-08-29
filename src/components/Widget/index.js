@@ -103,6 +103,7 @@ class Widget extends Component {
   }
 
   componentDidUpdate() {
+    
     this.props.dispatch(pullSession());
     this.trySendInitPayload();
     if (this.props.embedded && this.props.initialized) {
@@ -162,6 +163,7 @@ class Widget extends Component {
     if (Object.keys(message).length === 0) {
       return;
     }
+    
 
     if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
@@ -199,12 +201,33 @@ class Widget extends Component {
   handleMessageSubmit = (event) => {
     event.preventDefault();
     const userUttered = event.target.message.value;
+    const userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
+
+    // debugger;
+    
     if (userUttered) {
       this.props.dispatch(addUserMessage(userUttered));
-      this.props.dispatch(emitUserMessage(userUttered));
+      this.props.dispatch(emitUserMessage(userUtteredWithMails));
     }
     event.target.message.value = '';
   };
+
+  //TODO: Moamen added this
+  replaceNamesWithMails(input) {
+    let result = input;
+    const { mailPositions } = this.state;
+
+    if(!mailPositions.length) {
+      return input;
+    }
+
+    for(let i = 0 ; i < mailPositions.length ; i++) {
+      result = result.replace(mailPositions[i].name, mailPositions[i].mail);
+    }
+
+    return result;
+  }
+  //TODO: ENDOF Moamen added this
 
   render() {
     return (
@@ -226,6 +249,7 @@ class Widget extends Component {
         openLauncherImage={this.props.openLauncherImage}
         closeImage={this.props.closeImage}
         customComponent={this.props.customComponent}
+        contactsPath={this.props.contactsPath}
       />
     );
   }

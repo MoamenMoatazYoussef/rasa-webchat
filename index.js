@@ -25,6 +25,7 @@ const plugin = {
         openLauncherImage={args.openLauncherImage}
         closeImage={args.closeImage}
         docViewer={args.docViewer}
+        contactsPath={args.contactsPath}
       />, document.querySelector(args.selector)
     );
   }
@@ -41,6 +42,7 @@ plugin.init({
   connectingText: "Waiting for server...",
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
+  contactsPath: "./src/resources/accounts.json", //"./src/resources/accounts.json",
   params: {
     images: {
       dims: {

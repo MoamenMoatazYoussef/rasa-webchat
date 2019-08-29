@@ -16,6 +16,8 @@ const ConnectedWidget = (props) => {
     storage,
     props.docViewer,
   );
+
+  
   return (<Provider store={store}>
     <Widget
       socket={sock}
@@ -36,6 +38,7 @@ const ConnectedWidget = (props) => {
       openLauncherImage={props.openLauncherImage}
       closeImage={props.closeImage}
       customComponent={props.customComponent}
+      contactsPath={props.contactsPath}
     />
   </Provider>);
 };
