@@ -29,6 +29,12 @@
     
     .send-icon {
       height: 25px;
+      opacity: 0.6;
+      transition: 0.3s;
+    }
+
+    .send-icon:hover {
+      opacity: 1;
     }
   }
   
@@ -47,3 +53,4 @@
     height: 60px;
   }
 }
+

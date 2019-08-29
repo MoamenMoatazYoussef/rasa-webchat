@@ -202,8 +202,6 @@ class Widget extends Component {
     event.preventDefault();
     const userUttered = event.target.message.value;
     const userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
-
-    // debugger;
     
     if (userUttered) {
       this.props.dispatch(addUserMessage(userUttered));

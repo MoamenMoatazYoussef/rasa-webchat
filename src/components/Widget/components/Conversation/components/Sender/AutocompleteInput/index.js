@@ -30,8 +30,8 @@ class AutocompleteInput extends Component {
       selected: 0
     };
 
-    this.startTag = "\f";
-    this.endTag = "\0";
+    this.startTag = "@";
+    this.endTag = "\f";
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -79,19 +79,19 @@ class AutocompleteInput extends Component {
     }
   }
 
-  onClick(i, cursorPosition, event) {
-    const {
-      autocompleteList,
-      autocompleteStart,
-      currentInput,
-      mailPositions
-    } = this.state;
+  onClick(i, cursorPosition) {
+    const { autocompleteList, currentInput, mailPositions } = this.state;
     const selectedOption = autocompleteList[i];
 
+    const autocompleteStart = this.getAutocompleteStart(
+      currentInput,
+      cursorPosition
+    );
+
     const autocompleteEnd = //TODO: this is a bug fix tryout
-      this.getAutocompleteEnd(currentInput) < cursorPosition
+      this.getAutocompleteEnd(currentInput, cursorPosition) < cursorPosition
         ? cursorPosition
-        : this.getAutocompleteEnd(currentInput);
+        : this.getAutocompleteEnd(currentInput, cursorPosition);
 
     const newInput =
       currentInput.substring(0, autocompleteStart) +
@@ -106,7 +106,7 @@ class AutocompleteInput extends Component {
         ...mailPositions,
         {
           mail: selectedOption.mail,
-          name: selectedOption.displayName
+          name: this.startTag + selectedOption.displayName + this.endTag
         }
       ],
       autocompleteList: [],
@@ -119,6 +119,7 @@ class AutocompleteInput extends Component {
 
   onSubmit(event) {
     event.target.mailInput = this.replaceNamesWithMails(event);
+    console.log(event.target.mailInput);
   }
 
   onDelete(event) {
@@ -145,43 +146,6 @@ class AutocompleteInput extends Component {
         }
         return newInput;
     }
-  }
-
-  whereAmI(input, start) {
-    for (let i = start; i < input.length - this.startTag.length + 1; i++) {
-      if (input.substr(i, this.startTag.length) === this.startTag) {
-        return "normal";
-      } else if (input.substr(i, this.endTag.length) === this.endTag) {
-        return "tag";
-      }
-    }
-    return "normal";
-  }
-
-  getTagPosition(input, start) {
-    let startTagPosition, endTagPosition;
-    for (let i = start; i < input.length; i++) {
-      if (input.substr(i, this.endTag.length) === this.endTag) {
-        endTagPosition = i + this.endTag.length - 1;
-        break;
-      }
-    }
-
-    for (let i = start; i >= 0; i--) {
-      if (input.substr(i, this.startTag.length) === this.startTag) {
-        startTagPosition = i;
-        break;
-      }
-    }
-
-    return {
-      start: startTagPosition,
-      end: endTagPosition
-    };
-  }
-
-  deleteName(input, start, end) {
-    return input.substring(0, start) + input.substr(end + 1);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
@@ -215,6 +179,9 @@ class AutocompleteInput extends Component {
         return;
 
       case KEY_ENTER:
+        if(autocompleteList[selected] === undefined) {
+          return;
+        }
         event.preventDefault();
         this.onClick(selected, event.target.selectionStart, event);
         return;
@@ -249,25 +216,35 @@ class AutocompleteInput extends Component {
   getFromLastWord(s, cursorPosition) {
     let noOfSpaces = 0;
     let indexOfLastWord = 0;
+    let i;
 
-    for (let i = cursorPosition; i >= 0 && noOfSpaces <= 2; i--) {
+    for (i = cursorPosition; i >= 0 && noOfSpaces <= 2; i--) {
       if (s[i] === " ") {
         noOfSpaces++;
         indexOfLastWord = i;
       }
     }
 
+    if (i === -1) {
+      indexOfLastWord = 0;
+    }
+
     return s.substring(indexOfLastWord, cursorPosition);
   }
 
-  getAutocompleteEnd(s) {
-    const { autocompleteStart } = this.state;
-    let i = autocompleteStart;
+  getAutocompleteStart(s, start) {
+    let i = start;
+    while (s[i] !== "@" && i >= 0) {
+      i--;
+    }
+    return i;
+  }
 
+  getAutocompleteEnd(s, start) {
+    let i = start;
     while (s[i] !== " " && i < s.length) {
       i++;
     }
-
     return i;
   }
 
@@ -290,11 +267,64 @@ class AutocompleteInput extends Component {
       return input;
     }
 
+    debugger;
+
     for (let i = 0; i < mailPositions.length; i++) {
       result = result.replace(mailPositions[i].name, mailPositions[i].mail);
     }
 
     return result;
+  }
+
+  whereAmI(input, start) {
+    if (
+      input[start - 1] === this.startTag ||
+      input[start - 1] === this.endTag
+    ) {
+      return "tag";
+    }
+
+    for (let i = start; i <= input.length - (this.startTag.length - 1); i++) {
+      if (input.substr(i, this.startTag.length) === this.startTag) {
+        return "normal";
+      } else if (input.substr(i, this.endTag.length) === this.endTag) {
+        return "tag";
+      }
+    }
+    return "normal";
+  }
+
+  getTagPosition(input, start) {
+    let startTagPosition, endTagPosition;
+
+    if (input[start - 1] === this.endTag) {
+      endTagPosition = start - 1;
+    } else if (input[start - 1] === this.startTag) {
+      endTagPosition = start - 1;
+    }
+
+    for (let i = start; i < input.length; i++) {
+      if (input.substr(i, this.endTag.length) === this.endTag) {
+        endTagPosition = i + this.endTag.length - 1;
+        break;
+      }
+    }
+
+    for (let i = start; i >= 0; i--) {
+      if (input.substr(i, this.startTag.length) === this.startTag) {
+        startTagPosition = i;
+        break;
+      }
+    }
+
+    return {
+      start: startTagPosition,
+      end: endTagPosition
+    };
+  }
+
+  deleteName(input, start, end) {
+    return input.substring(0, start) + input.substr(end + 1);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
@@ -312,7 +342,6 @@ class AutocompleteInput extends Component {
     //       dataList: contacts
     //     });
     //   });
-
     // let dataList = {};
     // fetch(this.props.contactsPath)
     // .then(res => res.json())
@@ -381,9 +410,7 @@ class AutocompleteInput extends Component {
                     order: 100,
                     enabled: true
                   },
-                  inner: {
-                    
-                  },
+                  inner: {},
                   computeStyle: {
                     gpuAcceleration: false,
                     x: "'top'"
