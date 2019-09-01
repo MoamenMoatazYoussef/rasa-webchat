@@ -31,7 +31,7 @@ class AutocompleteInput extends Component {
     };
 
     this.startTag = "@";
-    this.endTag = "\f"; //"$"; 
+    this.endTag = "\f"; //"$";
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
@@ -53,7 +53,9 @@ class AutocompleteInput extends Component {
 
   onKeyDown(event) {
     if (event.keyCode === KEY_DELETE) {
+      const cursorPosition = event.target.selectionEnd;
       event.target.value = this.onDelete(event);
+      event.target.selectionEnd = cursorPosition;
       this.setCurrentInput(event);
       return;
     }
@@ -149,8 +151,6 @@ class AutocompleteInput extends Component {
             tagPosition.start,
             tagPosition.end
           );
-          console.log(JSON.stringify(newInput));
-          debugger;
           event.preventDefault();
         } catch (e) {
           console.log(e);
@@ -266,9 +266,24 @@ class AutocompleteInput extends Component {
   }
 
   matchWithArray(pattern, dataList) {
+    //this.startTag + selectedOption.displayName + this.endTag
+
+    const { mailPositions } = this.state;
+
+    let alreadySelected = [];
+    for (let i = 0; i < mailPositions.length; i++) {
+      alreadySelected.push(
+        mailPositions[i].name
+          .substring(1, mailPositions[i].name.length - 1)
+      );
+    }
+
     let result = [];
     for (let i = 0; i < dataList.length; i++) {
-      if (dataList[i].displayName.toLowerCase().match(pattern.toLowerCase())) {
+      if (
+        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase()) &&
+        !alreadySelected.includes(dataList[i].displayName)
+      ) {
         result.push(dataList[i]);
       }
     }
