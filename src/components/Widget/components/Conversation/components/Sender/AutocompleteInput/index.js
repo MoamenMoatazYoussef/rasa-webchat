@@ -31,7 +31,7 @@ class AutocompleteInput extends Component {
     };
 
     this.startTag = "@";
-    this.endTag = "\f";
+    this.endTag = "\f"; //"$"; 
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
@@ -58,13 +58,10 @@ class AutocompleteInput extends Component {
       return;
     }
 
-    const { currentInput, autocompleteState } = this.state;
+    const { autocompleteState } = this.state;
 
     const i = event.target.selectionStart - 1;
     const newAutocompleteState = event.target.value[i] === "@";
-    // const changed = event.target.value !== currentInput;
-
-    // debugger;
 
     if (autocompleteState || newAutocompleteState) {
       this.performNavigation(event);
@@ -78,8 +75,6 @@ class AutocompleteInput extends Component {
     const newAutocompleteState = event.target.value[i] === "@";
     const changed = event.target.value !== currentInput;
 
-    debugger;
-    
     if (changed && (autocompleteState || newAutocompleteState)) {
       this.performAutocomplete(event, i);
     } else {
@@ -99,8 +94,6 @@ class AutocompleteInput extends Component {
       currentInput,
       cursorPosition
     );
-
-    debugger;
 
     const autocompleteEnd =
       this.getAutocompleteEnd(currentInput, cursorPosition) < cursorPosition
@@ -156,6 +149,9 @@ class AutocompleteInput extends Component {
             tagPosition.start,
             tagPosition.end
           );
+          console.log(JSON.stringify(newInput));
+          debugger;
+          event.preventDefault();
         } catch (e) {
           console.log(e);
           newInput = event.target.value;
@@ -169,7 +165,6 @@ class AutocompleteInput extends Component {
   setCurrentInput(event) {
     this.setState({
       currentInput: event.target.value
-      // autocompleteState: false
     });
   }
 
@@ -208,8 +203,14 @@ class AutocompleteInput extends Component {
   }
 
   performAutocomplete(event) {
-    const startIndex = this.getAutocompleteStart(event.target.value, event.target.selectionStart);
-    const pattern = event.target.value.substring(startIndex + 1, event.target.selectionStart);
+    const startIndex = this.getAutocompleteStart(
+      event.target.value,
+      event.target.selectionStart
+    );
+    const pattern = event.target.value.substring(
+      startIndex + 1,
+      event.target.selectionStart
+    );
     const { dataList } = this.state;
     const matchingWords = this.matchWithArray(pattern, dataList);
 
@@ -311,29 +312,39 @@ class AutocompleteInput extends Component {
   getTagPosition(input, start) {
     let startTagPosition, endTagPosition;
 
-    if (input[start - 1] === this.endTag) {
-      endTagPosition = start - 1;
-    } else if (input[start - 1] === this.startTag) {
-      endTagPosition = start - 1;
+    switch (input[start - 1]) {
+      case this.endTag:
+        endTagPosition = start - 1;
+        break;
+      case this.startTag:
+        startTagPosition = start - 1;
+        break;
+      default:
+        break;
     }
 
-    for (let i = start; i < input.length; i++) {
-      if (input.substr(i, this.endTag.length) === this.endTag) {
-        endTagPosition = i + this.endTag.length - 1;
-        break;
+    if (endTagPosition === undefined) {
+      for (let i = start - 1; i < input.length; i++) {
+        if (input[i] === this.endTag) {
+          //if (input.substr(i, this.endTag.length) === this.endTag) {
+          endTagPosition = i + this.endTag.length - 1;
+          break;
+        }
       }
     }
 
-    for (let i = start; i >= 0; i--) {
-      if (input.substr(i, this.startTag.length) === this.startTag) {
-        startTagPosition = i;
-        break;
+    if (startTagPosition === undefined) {
+      for (let i = start - 1; i >= 0; i--) {
+        if (input[i] === this.startTag) {
+          startTagPosition = i;
+          break;
+        }
       }
     }
 
     return {
       start: startTagPosition,
-      end: endTagPosition
+      end: endTagPosition || startTagPosition
     };
   }
 
