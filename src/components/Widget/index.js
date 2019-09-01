@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 import {
   toggleChat,
   openChat,
@@ -18,15 +18,17 @@ import {
   connectServer,
   disconnectServer,
   pullSession
-} from 'actions';
+} from "actions";
 
-import { isSnippet, isVideo, isImage, isQR, isText } from './msgProcessor';
-import WidgetLayout from './layout';
-import { storeLocalSession, getLocalSession } from '../../store/reducers/helper';
-import { SESSION_NAME, NEXT_MESSAGE } from 'constants';
+import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
+import WidgetLayout from "./layout";
+import {
+  storeLocalSession,
+  getLocalSession
+} from "../../store/reducers/helper";
+import { SESSION_NAME, NEXT_MESSAGE } from "constants";
 
 class Widget extends Component {
-
   constructor(props) {
     super(props);
     this.messages = [];
@@ -40,7 +42,7 @@ class Widget extends Component {
   componentDidMount() {
     const { socket, storage } = this.props;
 
-    socket.on('bot_uttered', (botUttered) => {
+    socket.on("bot_uttered", botUttered => {
       this.messages.push(botUttered);
     });
 
@@ -48,12 +50,12 @@ class Widget extends Component {
 
     // Request a session from server
     const local_id = this.getSessionId();
-    socket.on('connect', () => {
-      socket.emit('session_request', ({ 'session_id': local_id }));
+    socket.on("connect", () => {
+      socket.emit("session_request", { session_id: local_id });
     });
 
     // When session_confirm is received from the server:
-    socket.on('session_confirm', (remote_id) => {
+    socket.on("session_confirm", remote_id => {
       console.log(`session_confirm:${socket.id} session_id:${remote_id}`);
 
       // Store the initial state to both the redux store and the storage, set connected to true
@@ -65,13 +67,12 @@ class Widget extends Component {
       start a new session.
       */
       if (local_id !== remote_id) {
-
         // storage.clear();
         // Store the received session_id to storage
 
         storeLocalSession(storage, SESSION_NAME, remote_id);
         this.props.dispatch(pullSession());
-        this.trySendInitPayload()
+        this.trySendInitPayload();
       } else {
         // If this is an existing session, it's possible we changed pages and want to send a
         // user message when we land.
@@ -89,9 +90,9 @@ class Widget extends Component {
       }
     });
 
-    socket.on('disconnect', (reason) => {
+    socket.on("disconnect", reason => {
       console.log(reason);
-      if (reason !== 'io client disconnect') {
+      if (reason !== "io client disconnect") {
         this.props.dispatch(disconnectServer());
       }
     });
@@ -103,7 +104,6 @@ class Widget extends Component {
   }
 
   componentDidUpdate() {
-    
     this.props.dispatch(pullSession());
     this.trySendInitPayload();
     if (this.props.embedded && this.props.initialized) {
@@ -121,7 +121,7 @@ class Widget extends Component {
     const { storage } = this.props;
     // Get the local session, check if there is an existing session_id
     const localSession = getLocalSession(storage, SESSION_NAME);
-    const local_id = localSession? localSession.session_id: null;
+    const local_id = localSession ? localSession.session_id : null;
     return local_id;
   }
 
@@ -142,18 +142,26 @@ class Widget extends Component {
     } = this.props;
 
     // Send initial payload when chat is opened or widget is shown
-    if (!initialized && connected && (((isChatOpen && isChatVisible) || embedded))) {
+    if (
+      !initialized &&
+      connected &&
+      ((isChatOpen && isChatVisible) || embedded)
+    ) {
       // Only send initial payload if the widget is connected to the server but not yet initialized
 
       const session_id = this.getSessionId();
 
       // check that session_id is confirmed
-      if (!session_id) return
-      console.log("sending init payload", session_id)
-      socket.emit('user_uttered', { message: initPayload, customData, session_id: session_id });
+      if (!session_id) return;
+      console.log("sending init payload", session_id);
+      socket.emit("user_uttered", {
+        message: initPayload,
+        customData,
+        session_id: session_id
+      });
       this.props.dispatch(initialize());
     }
-  }
+  };
 
   toggleConversation = () => {
     this.props.dispatch(toggleChat());
@@ -163,7 +171,6 @@ class Widget extends Component {
     if (Object.keys(message).length === 0) {
       return;
     }
-    
 
     if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
@@ -171,57 +178,79 @@ class Widget extends Component {
       this.props.dispatch(addQuickReply(message));
     } else if (isSnippet(message)) {
       const element = message.attachment.payload.elements[0];
-      this.props.dispatch(addLinkSnippet({
-        title: element.title,
-        content: element.buttons[0].title,
-        link: element.buttons[0].url,
-        target: '_blank'
-      }));
+      this.props.dispatch(
+        addLinkSnippet({
+          title: element.title,
+          content: element.buttons[0].title,
+          link: element.buttons[0].url,
+          target: "_blank"
+        })
+      );
     } else if (isVideo(message)) {
       const element = message.attachment.payload;
-      this.props.dispatch(addVideoSnippet({
-        title: element.title,
-        video: element.src
-      }));
+      this.props.dispatch(
+        addVideoSnippet({
+          title: element.title,
+          video: element.src
+        })
+      );
     } else if (isImage(message)) {
       const element = message.attachment.payload;
-      this.props.dispatch(addImageSnippet({
-        title: element.title,
-        image: element.src
-      }));
+      this.props.dispatch(
+        addImageSnippet({
+          title: element.title,
+          image: element.src
+        })
+      );
     } else {
       // some custom message
       const props = message;
       if (this.props.customComponent) {
-        this.props.dispatch(renderCustomComponent(this.props.customComponent, props, true));
+        this.props.dispatch(
+          renderCustomComponent(this.props.customComponent, props, true)
+        );
       }
     }
   }
 
-  handleMessageSubmit = (event) => {
+  handleMessageSubmit = event => {
     event.preventDefault();
     const userUttered = event.target.message.value;
-    const userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
-    
+    let userUtteredWithMails = userUttered;
+
+    // console.log(event.target.message.mailInput)
+
+    if (
+      event.target.message.mailInput !== undefined &&
+      event.target.message.mailInput !== ""
+    ) {
+      userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
+    }
+
+    // console.log(userUtteredWithMails);
+
     if (userUttered) {
       this.props.dispatch(addUserMessage(userUttered));
       this.props.dispatch(emitUserMessage(userUtteredWithMails));
     }
-    event.target.message.value = '';
+    event.target.message.value = "";
   };
 
   //TODO: Moamen added this
   replaceNamesWithMails(input) {
     let result = input;
+    console.log(result);
     const { mailPositions } = this.state;
 
-    if(!mailPositions.length) {
+    if (!mailPositions.length) {
       return input;
     }
 
-    for(let i = 0 ; i < mailPositions.length ; i++) {
+    for (let i = 0; i < mailPositions.length; i++) {
       result = result.replace(mailPositions[i].name, mailPositions[i].mail);
     }
+
+    console.log(result);
 
     return result;
   }
@@ -254,10 +283,10 @@ class Widget extends Component {
 }
 
 const mapStateToProps = state => ({
-  initialized: state.behavior.get('initialized'),
-  connected: state.behavior.get('connected'),
-  isChatOpen: state.behavior.get('isChatOpen'),
-  isChatVisible: state.behavior.get('isChatVisible')
+  initialized: state.behavior.get("initialized"),
+  connected: state.behavior.get("connected"),
+  isChatOpen: state.behavior.get("isChatOpen"),
+  isChatVisible: state.behavior.get("isChatVisible")
 });
 
 Widget.propTypes = {
@@ -285,7 +314,7 @@ Widget.propTypes = {
 
 Widget.defaultProps = {
   isChatOpen: false,
-  isChatVisible: true,
+  isChatVisible: true
 };
 
 export default connect(mapStateToProps)(Widget);
