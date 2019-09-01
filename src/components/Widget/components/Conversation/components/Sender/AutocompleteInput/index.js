@@ -110,6 +110,12 @@ class AutocompleteInput extends Component {
       currentInput.substr(autocompleteEnd);
 
     event.target.value = newInput;
+    event.target.selectionEnd = (
+      currentInput.substring(0, autocompleteStart) +
+      this.startTag +
+      selectedOption.displayName +
+      this.endTag
+    ).length;
 
     this.setState({
       currentInput: newInput,
@@ -130,7 +136,10 @@ class AutocompleteInput extends Component {
 
   onSubmit(event) {
     event.target.mailInput = this.replaceNamesWithMails(event);
-    console.log(event.target.mailInput);
+    this.setState({
+      mailPositions: []
+    });
+    // console.log(event.target.mailInput);
   }
 
   onDelete(event) {
@@ -273,8 +282,7 @@ class AutocompleteInput extends Component {
     let alreadySelected = [];
     for (let i = 0; i < mailPositions.length; i++) {
       alreadySelected.push(
-        mailPositions[i].name
-          .substring(1, mailPositions[i].name.length - 1)
+        mailPositions[i].name.substring(1, mailPositions[i].name.length - 1)
       );
     }
 
