@@ -31,29 +31,29 @@ const plugin = {
   }
 };
 
-// //TODO: Moamen added this
-// plugin.init({
-//   selector: "#webchat",
-//   initPayload: "/get_started",
-//   socketUrl: "http://10.10.19.56:5500/",
-//   socketPath: "/socket.io/",
-//   title: "DEV Test",
-//   inputTextFieldHint: "Type a message...",
-//   connectingText: "Waiting for server...",
-//   hideWhenNotConnected: false, //TODO: Moamen added this
-//   docViewer: false,
-//   contactsPath: "./src/resources/accounts.json", //"./src/resources/accounts.json",
-//   params: {
-//     images: {
-//       dims: {
-//         width: 300,
-//         height: 200
-//       }
-//     },
-//     storage: "local"
-//   }
-// });
-// //TODO: ENDOF Moamen added this
+//TODO: Moamen added this
+plugin.init({
+  selector: "#webchat",
+  initPayload: "/get_started",
+  socketUrl: "http://10.10.19.56:5500/",
+  socketPath: "/socket.io/",
+  title: "DEV Test",
+  inputTextFieldHint: "Type a message...",
+  connectingText: "Waiting for server...",
+  hideWhenNotConnected: false, //TODO: Moamen added this
+  docViewer: false,
+  contactsPath: "./src/resources/accounts.json", //"./src/resources/accounts.json",
+  params: {
+    images: {
+      dims: {
+        width: 300,
+        height: 200
+      }
+    },
+    storage: "local"
+  }
+});
+//TODO: ENDOF Moamen added this
 
 export {
   plugin as default,

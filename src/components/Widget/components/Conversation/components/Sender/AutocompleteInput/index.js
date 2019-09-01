@@ -34,6 +34,7 @@ class AutocompleteInput extends Component {
     this.endTag = "\f";
 
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
     this.onClick = this.onClick.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
@@ -57,19 +58,30 @@ class AutocompleteInput extends Component {
       return;
     }
 
-    const s = this.getFromLastWord(
-      event.target.value,
-      event.target.selectionStart
-    );
+    const { currentInput, autocompleteState } = this.state;
 
-    const autocompleteState = this.checkAutocomplete(s);
+    const i = event.target.selectionStart - 1;
+    const newAutocompleteState = event.target.value[i] === "@";
+    // const changed = event.target.value !== currentInput;
 
-    if (autocompleteState) {
-      event.keyCode === KEY_DOWN ||
-      event.keyCode === KEY_UP ||
-      event.keyCode === KEY_ENTER
-        ? this.performNavigation(event)
-        : this.performAutocomplete(event, s);
+    // debugger;
+
+    if (autocompleteState || newAutocompleteState) {
+      this.performNavigation(event);
+    }
+  }
+
+  onKeyUp(event) {
+    const { currentInput, autocompleteState } = this.state;
+
+    const i = event.target.selectionStart - 1;
+    const newAutocompleteState = event.target.value[i] === "@";
+    const changed = event.target.value !== currentInput;
+
+    debugger;
+    
+    if (changed && (autocompleteState || newAutocompleteState)) {
+      this.performAutocomplete(event, i);
     } else {
       if (event.keyCode === KEY_ENTER) {
         this.onSubmit(event);
@@ -79,7 +91,7 @@ class AutocompleteInput extends Component {
     }
   }
 
-  onClick(i, cursorPosition) {
+  onClick(i, cursorPosition, event) {
     const { autocompleteList, currentInput, mailPositions } = this.state;
     const selectedOption = autocompleteList[i];
 
@@ -88,7 +100,9 @@ class AutocompleteInput extends Component {
       cursorPosition
     );
 
-    const autocompleteEnd = //TODO: this is a bug fix tryout
+    debugger;
+
+    const autocompleteEnd =
       this.getAutocompleteEnd(currentInput, cursorPosition) < cursorPosition
         ? cursorPosition
         : this.getAutocompleteEnd(currentInput, cursorPosition);
@@ -99,6 +113,8 @@ class AutocompleteInput extends Component {
       selectedOption.displayName +
       this.endTag +
       currentInput.substr(autocompleteEnd);
+
+    event.target.value = newInput;
 
     this.setState({
       currentInput: newInput,
@@ -152,8 +168,8 @@ class AutocompleteInput extends Component {
 
   setCurrentInput(event) {
     this.setState({
-      currentInput: event.target.value,
-      autocompleteState: false
+      currentInput: event.target.value
+      // autocompleteState: false
     });
   }
 
@@ -179,7 +195,7 @@ class AutocompleteInput extends Component {
         return;
 
       case KEY_ENTER:
-        if(autocompleteList[selected] === undefined) {
+        if (autocompleteList[selected] === undefined) {
           return;
         }
         event.preventDefault();
@@ -191,24 +207,24 @@ class AutocompleteInput extends Component {
     }
   }
 
-  performAutocomplete(event, s) {
-    const i = s.indexOf("@");
-    const pattern = s.substr(i + 1);
+  performAutocomplete(event) {
+    const startIndex = this.getAutocompleteStart(event.target.value, event.target.selectionStart);
+    const pattern = event.target.value.substring(startIndex + 1, event.target.selectionStart);
     const { dataList } = this.state;
     const matchingWords = this.matchWithArray(pattern, dataList);
 
     this.setState({
       currentInput: event.target.value,
       autocompleteState: true,
-      autocompleteStart: event.target.value.indexOf("@"),
+      autocompleteStart: startIndex,
       autocompleteEnd: event.target.selectionStart - 1,
       autocompleteList: matchingWords
     });
   }
 
-  checkAutocomplete(s) {
+  checkAutocomplete(s, cursorPosition) {
     const i = s.indexOf("@");
-    return !(i === -1);
+    return i === cursorPosition - 1;
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Helper functions >>>>>>>>>>>>>>>>>>>> */
@@ -266,8 +282,6 @@ class AutocompleteInput extends Component {
     if (!mailPositions.length) {
       return input;
     }
-
-    debugger;
 
     for (let i = 0; i < mailPositions.length; i++) {
       result = result.replace(mailPositions[i].name, mailPositions[i].mail);
@@ -389,10 +403,11 @@ class AutocompleteInput extends Component {
                   disabled={disabledInput}
                   autoFocus
                   autoComplete="off"
-                  onChange={this.onKeyDown} //.bind(this)
+                  // onChange={this.onKeyDown} //.bind(this)
+                  onKeyUp={this.onKeyUp}
                   onKeyDown={this.onKeyDown}
                   onSubmit={() => this.onSubmit(this)}
-                  value={currentInput}
+                  // value={currentInput}
                 />
               )}
             </Reference>
