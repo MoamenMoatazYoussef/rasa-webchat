@@ -67,6 +67,11 @@ class AutocompleteInput extends Component {
 
     if (autocompleteState || newAutocompleteState) {
       this.performNavigation(event);
+    } else {
+      if(event.keyCode === KEY_ENTER) {
+        event.target.mailInput = this.replaceNamesWithMails(event);
+        return;
+      }
     }
   }
 
@@ -136,9 +141,9 @@ class AutocompleteInput extends Component {
 
   onSubmit(event) {
     event.target.mailInput = this.replaceNamesWithMails(event);
-    this.setState({
-      mailPositions: []
-    });
+    // this.setState({
+    //   mailPositions: []
+    // });
     // console.log(event.target.mailInput);
   }
 
@@ -277,20 +282,20 @@ class AutocompleteInput extends Component {
   matchWithArray(pattern, dataList) {
     //this.startTag + selectedOption.displayName + this.endTag
 
-    const { mailPositions } = this.state;
+    // const { mailPositions } = this.state;
 
-    let alreadySelected = [];
-    for (let i = 0; i < mailPositions.length; i++) {
-      alreadySelected.push(
-        mailPositions[i].name.substring(1, mailPositions[i].name.length - 1)
-      );
-    }
+    // let alreadySelected = [];
+    // for (let i = 0; i < mailPositions.length; i++) {
+    //   alreadySelected.push(
+    //     mailPositions[i].name.substring(1, mailPositions[i].name.length - 1)
+    //   );
+    // }
 
     let result = [];
     for (let i = 0; i < dataList.length; i++) {
       if (
-        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase()) &&
-        !alreadySelected.includes(dataList[i].displayName)
+        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase()) //&&
+        // !alreadySelected.includes(dataList[i].displayName)
       ) {
         result.push(dataList[i]);
       }
@@ -302,6 +307,8 @@ class AutocompleteInput extends Component {
     let input = event.target.value;
     let result = input;
     const { mailPositions } = this.state;
+
+    // console.log(result);
 
     if (!mailPositions.length) {
       return input;
