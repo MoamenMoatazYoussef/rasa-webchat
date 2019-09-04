@@ -20,7 +20,7 @@ class AutocompleteInput extends Component {
     this.state = {
       currentInput: "",
       mailPositions: [],
-      dataList: contacts,
+      dataList: [],
 
       autocompleteList: [],
       autocompleteStart: 0,
@@ -68,7 +68,7 @@ class AutocompleteInput extends Component {
     if (autocompleteState || newAutocompleteState) {
       this.performNavigation(event);
     } else {
-      if(event.keyCode === KEY_ENTER) {
+      if (event.keyCode === KEY_ENTER) {
         event.target.mailInput = this.replaceNamesWithMails(event);
         return;
       }
@@ -295,7 +295,7 @@ class AutocompleteInput extends Component {
     let result = [];
     for (let i = 0; i < dataList.length; i++) {
       if (
-        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase()) 
+        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase())
         // && !alreadySelected.includes(dataList[i].displayName)
       ) {
         result.push(dataList[i]);
@@ -386,28 +386,41 @@ class AutocompleteInput extends Component {
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
   componentDidMount() {
-    // axios.get(this.props.contactsPath) // JSON File Path
+    let date = new Date().getHours();
+    let oldDate = Number(localStorage.getItem("date"));
+    let oldContacts = localStorage.getItem("contacts");
+
+    const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
+
+    if (oldContacts && date - oldDate < refreshPeriod) {
+      console.log("loaded from cache");
+      this.setState({
+        dataList: JSON.parse(localStorage.getItem("contacts"))
+      });
+      return;
+    }
+
+    console.log("fetching data");
+    let newContacts = [];
+
+    // axios
+    //   .get(this.props.contactsPath) // JSON File Path
     //   .then(response => {
-    //     this.setState({
-    //       dataList: response.data
-    //     });
-    //   })
-    //   .catch(function(error) {
-    //     console.log(error);
-    //     this.setState({
-    //       dataList: contacts
-    //     });
-    //   });
-    // let dataList = {};
-    // fetch(this.props.contactsPath)
-    // .then(res => res.json())
-    // .then(data => dataList = data)
-    // .catch(error => console.log(error));
-    // dataList = require(this.props.contactsPath);
-    // console.log(dataList);
-    // this.setState({
-    //   dataList
+      newContacts = contacts; //response.data
+    // })
+    // .catch(function(error) {
+    //   console.log(error);
     // });
+
+    while(newContacts === []);
+
+    localStorage.setItem("contacts", JSON.stringify(newContacts));
+    localStorage.setItem("date", new Date().getHours());
+
+    this.setState({
+      dataList: newContacts
+    });
+
   }
 
   componentDidUpdate() {
@@ -424,7 +437,6 @@ class AutocompleteInput extends Component {
       autocompleteState,
       autocompleteList,
       selected,
-      currentInput,
       pageStart,
       pageEnd
     } = this.state;
