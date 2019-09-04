@@ -201,7 +201,9 @@ class Widget extends Component {
   handleMessageSubmit = (event) => {
     event.preventDefault();
     const userUttered = event.target.message.value;
-    const userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
+    const userUtteredWithMails = event.target.message.mailInput;
+
+    console.log(userUtteredWithMails);
     
     if (userUttered) {
       this.props.dispatch(addUserMessage(userUttered));

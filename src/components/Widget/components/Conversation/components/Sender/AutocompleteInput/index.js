@@ -67,6 +67,11 @@ class AutocompleteInput extends Component {
 
     if (autocompleteState || newAutocompleteState) {
       this.performNavigation(event);
+    } else {
+      if(event.keyCode === KEY_ENTER) {
+        event.target.mailInput = this.replaceNamesWithMails(event);
+        return;
+      }
     }
   }
 
@@ -136,9 +141,9 @@ class AutocompleteInput extends Component {
 
   onSubmit(event) {
     event.target.mailInput = this.replaceNamesWithMails(event);
-    this.setState({
-      mailPositions: []
-    });
+    // this.setState({
+    //   mailPositions: []
+    // });
     // console.log(event.target.mailInput);
   }
 
@@ -302,6 +307,8 @@ class AutocompleteInput extends Component {
     let input = event.target.value;
     let result = input;
     const { mailPositions } = this.state;
+
+    // console.log(result);
 
     if (!mailPositions.length) {
       return input;
