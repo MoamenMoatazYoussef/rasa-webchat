@@ -5,9 +5,6 @@ import axios from "axios";
 import "../style.scss";
 import "./style.scss";
 
-//TODO: remove this after finishing
-// const contacts = require("../../../../../../../resources/accounts.json");
-
 const KEY_DOWN = 40;
 const KEY_UP = 38;
 const KEY_ENTER = 13;
@@ -145,12 +142,7 @@ class AutocompleteInput extends Component {
   }
 
   onSubmit(event) {
-    // const { mailPositions } = this.state;
-    // console.log(mailPositions);
     event.target.mailInput = this.replaceNamesWithMails(event);
-    // this.setState({
-    //   mailPositions: []
-    // });
   }
 
   onDelete(event) {
@@ -286,23 +278,9 @@ class AutocompleteInput extends Component {
   }
 
   matchWithArray(pattern, dataList) {
-    //this.startTag + selectedOption.displayName + this.endTag
-
-    // const { mailPositions } = this.state;
-
-    // let alreadySelected = [];
-    // for (let i = 0; i < mailPositions.length; i++) {
-    //   alreadySelected.push(
-    //     mailPositions[i].name.substring(1, mailPositions[i].name.length - 1)
-    //   );
-    // }
-
     let result = [];
     for (let i = 0; i < dataList.length; i++) {
-      if (
-        dataList[i].displayName.toLowerCase().match(pattern.toLowerCase())
-        // && !alreadySelected.includes(dataList[i].displayName)
-      ) {
+      if (dataList[i].displayName.toLowerCase().match(pattern.toLowerCase())) {
         result.push(dataList[i]);
       }
     }
@@ -313,8 +291,6 @@ class AutocompleteInput extends Component {
     let input = event.target.value;
     let result = input;
     const { mailPositions } = this.state;
-
-    // console.log(result);
 
     if (!mailPositions.length) {
       return input;
@@ -362,7 +338,6 @@ class AutocompleteInput extends Component {
     if (endTagPosition === undefined) {
       for (let i = start - 1; i < input.length; i++) {
         if (input[i] === this.endTag) {
-          //if (input.substr(i, this.endTag.length) === this.endTag) {
           endTagPosition = i + this.endTag.length - 1;
           break;
         }
@@ -388,6 +363,29 @@ class AutocompleteInput extends Component {
     return input.substring(0, start) + input.substr(end + 1);
   }
 
+  checkContactStructure(contact, attributes) {
+    let temp = contact;
+
+    for (let i = 0; i < attributes.length; i++) {
+      if (temp[attributes[i]] == undefined) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  checkContactListStructure(contactList) {
+    for (let i = 0; i < contactList.length; i++) {
+      if (
+        !this.checkContactStructure(contactList[i], ["displayName", "mail"])
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   fetchContacts() {
     let date = new Date().getHours();
     let oldDate = Number(localStorage.getItem("date"));
@@ -404,7 +402,7 @@ class AutocompleteInput extends Component {
     }
 
     let newContacts = [];
-    console.log(!(newContacts === undefined || newContacts.length == 0));
+
     console.log(
       "fetching data from ",
       contactsPath,
@@ -414,26 +412,38 @@ class AutocompleteInput extends Component {
 
     axios
       .get(contactsPath)
-      .then((response) => {
+      .then(
+        response => {
           newContacts = response.data.results;
-          if (!(newContacts === undefined || newContacts.length == 0)) {
 
-            this.setState({
-              dataList: newContacts
-            });
-
-            localStorage.setItem("contacts", JSON.stringify(newContacts));
-            localStorage.setItem("date", new Date().getHours());
-            
-            return;
+          if (newContacts === undefined || newContacts.length == 0) {
+            throw new Error("Retrieved list of contacts is empty.");
           }
+
+          if (!this.checkContactStructure(newContacts[0], ["displayName", "mail"])) {
+            throw new Error("Invalid contact structure.");
+          }
+
+          this.setState({
+            dataList: newContacts
+          });
+
+          localStorage.setItem("contacts", JSON.stringify(newContacts));
+          localStorage.setItem("date", new Date().getHours());
+
+          return;
         },
-        (reason) => {
-          alert("Warning: contacts are not fetched, autocomplete is unavailable.", reason);
+        reason => {
+          alert(
+            `Warning: contacts are not fetched, autocomplete is unavailable. \nReason: ${reason.message}`
+          );
         }
       )
       .catch(error => {
-        alert("Error occured: ", error);
+        console.log(error.message);
+        alert(
+          `Warning: Error occured during contacts fetch, autocomplete is unavailable.\nReason: ${error.message}`
+          );
       });
   }
 
@@ -441,57 +451,6 @@ class AutocompleteInput extends Component {
 
   componentDidMount() {
     this.fetchContacts();
-    // setTimeout(() => this.fetchContacts(), 3000);
-    // let date = new Date().getHours();
-    // let oldDate = Number(localStorage.getItem("date"));
-    // let oldContacts = localStorage.getItem("contacts");
-
-    // const { contactsPath, refreshPeriod } = this.state;
-
-    // console.log("Cache saved: ", Boolean(oldContacts));
-    // console.log("Refresh period: ", refreshPeriod);
-    // console.log("Number of days since cache: ", date - oldDate);
-
-    // // const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
-
-    // if (oldContacts && date - oldDate < refreshPeriod) {
-    //   console.log("loaded from cache");
-    //   this.setState({
-    //     dataList: JSON.parse(localStorage.getItem("contacts"))
-    //   });
-    //   return;
-    // }
-
-    // let newContacts = [];
-    // console.log(newContacts === undefined || newContacts.length == 0);
-    // console.log(
-    //   "fetching data from ",
-    //   contactsPath,
-    //   ", refresh period: ",
-    //   refreshPeriod
-    // );
-
-    // while (newContacts === undefined || newContacts.length == 0) {
-    //   axios
-    //     .get(contactsPath) // JSON File Path
-    //     .then(response => {
-    //       newContacts = response.data;
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //     });
-    // }
-
-    // console.log("finished loading newContacts");
-
-    // if (newContacts === undefined || newContacts.length == 0) {
-    //   localStorage.setItem("contacts", JSON.stringify(newContacts));
-    //   localStorage.setItem("date", new Date().getHours());
-
-    //   this.setState({
-    //     dataList: newContacts
-    //   });
-    // }
   }
 
   componentDidUpdate() {
@@ -528,11 +487,9 @@ class AutocompleteInput extends Component {
                   disabled={disabledInput}
                   autoFocus
                   autoComplete="off"
-                  // onChange={this.onKeyDown} //.bind(this)
                   onKeyUp={this.onKeyUp}
                   onKeyDown={this.onKeyDown}
                   onSubmit={() => this.onSubmit(this)}
-                  // value={currentInput}
                 />
               )}
             </Reference>
