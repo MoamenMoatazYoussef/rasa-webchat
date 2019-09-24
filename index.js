@@ -46,7 +46,7 @@ plugin.init({
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
 
-  contactsPath: "localhost:8080/users", //"./src/resources/accounts.json",
+  contactsPath: "https://randomuser.me/api/", //"./src/resources/accounts.json",
   refreshPeriod: 1,
 
 

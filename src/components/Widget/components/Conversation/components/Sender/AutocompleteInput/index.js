@@ -395,12 +395,6 @@ class AutocompleteInput extends Component {
 
     const { contactsPath, refreshPeriod } = this.state;
 
-    console.log("Cache saved: ", Boolean(oldContacts));
-    console.log("Refresh period: ", refreshPeriod);
-    console.log("Number of days since cache: ", date - oldDate);
-
-    // const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
-
     if (oldContacts && date - oldDate < refreshPeriod) {
       console.log("loaded from cache");
       this.setState({
@@ -410,7 +404,7 @@ class AutocompleteInput extends Component {
     }
 
     let newContacts = [];
-    console.log(newContacts === undefined || newContacts.length == 0);
+    console.log(!(newContacts === undefined || newContacts.length == 0));
     console.log(
       "fetching data from ",
       contactsPath,
@@ -419,35 +413,35 @@ class AutocompleteInput extends Component {
     );
 
     axios
-      .get(contactsPath) // JSON File Path
-      .then(
-        function onfulfilled(response) {
-          newContacts = response.data;
-          if (newContacts === undefined || newContacts.length == 0) {
-            localStorage.setItem("contacts", JSON.stringify(newContacts));
-            localStorage.setItem("date", new Date().getHours());
+      .get(contactsPath)
+      .then((response) => {
+          newContacts = response.data.results;
+          if (!(newContacts === undefined || newContacts.length == 0)) {
 
             this.setState({
               dataList: newContacts
             });
+
+            localStorage.setItem("contacts", JSON.stringify(newContacts));
+            localStorage.setItem("date", new Date().getHours());
             
             return;
           }
         },
-        function onrejected(reason) {
-          alert("Warning: contacts are not fetched, autocomplete is unavailable.");
+        (reason) => {
+          alert("Warning: contacts are not fetched, autocomplete is unavailable.", reason);
         }
       )
       .catch(error => {
-        console.alert(error);
+        alert("Error occured: ", error);
       });
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
   componentDidMount() {
-    console.log("Wait till fetch");
-    setTimeout(() => this.fetchContacts(), 3000);
+    this.fetchContacts();
+    // setTimeout(() => this.fetchContacts(), 3000);
     // let date = new Date().getHours();
     // let oldDate = Number(localStorage.getItem("date"));
     // let oldContacts = localStorage.getItem("contacts");
