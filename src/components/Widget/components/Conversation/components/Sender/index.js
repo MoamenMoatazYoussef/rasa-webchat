@@ -7,14 +7,16 @@ import AutocompleteInput from "./AutocompleteInput";
 import send from "assets/send_button.svg";
 import "./style.scss";
 
-const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, contactsPath }) => (
+const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, contactsPath, refreshPeriod }) => (
   <form className="sender" onSubmit={sendMessage}>
     <AutocompleteInput
       inputFieldTextHint={inputFieldTextHint}
       disabledInput={disabledInput}
       autoFocus
       autoComplete="off"
+
       contactsPath={contactsPath}
+      refreshPeriod={refreshPeriod}
     />
     <button type="submit" className="send">
       <img src={send} className="send-icon" alt="send" />

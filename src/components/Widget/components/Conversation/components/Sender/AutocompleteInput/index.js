@@ -6,7 +6,7 @@ import "../style.scss";
 import "./style.scss";
 
 //TODO: remove this after finishing
-const contacts = require("../../../../../../../resources/accounts.json");
+// const contacts = require("../../../../../../../resources/accounts.json");
 
 const KEY_DOWN = 40;
 const KEY_UP = 38;
@@ -27,7 +27,10 @@ class AutocompleteInput extends Component {
       autocompleteEnd: 0,
       autocompleteState: false,
 
-      selected: 0
+      selected: 0,
+
+      contactsPath: props.contactsPath,
+      refreshPeriod: props.refreshPeriod
     };
 
     this.startTag = "@";
@@ -47,6 +50,8 @@ class AutocompleteInput extends Component {
     this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
     this.matchWithArray = this.matchWithArray.bind(this);
     this.replaceNamesWithMails = this.replaceNamesWithMails.bind(this);
+
+    this.fetchContacts = this.fetchContacts.bind(this);
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
@@ -383,14 +388,18 @@ class AutocompleteInput extends Component {
     return input.substring(0, start) + input.substr(end + 1);
   }
 
-  /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
-
-  componentDidMount() {
+  fetchContacts() {
     let date = new Date().getHours();
     let oldDate = Number(localStorage.getItem("date"));
     let oldContacts = localStorage.getItem("contacts");
 
-    const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
+    const { contactsPath, refreshPeriod } = this.state;
+
+    console.log("Cache saved: ", Boolean(oldContacts));
+    console.log("Refresh period: ", refreshPeriod);
+    console.log("Number of days since cache: ", date - oldDate);
+
+    // const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
 
     if (oldContacts && date - oldDate < refreshPeriod) {
       console.log("loaded from cache");
@@ -400,27 +409,95 @@ class AutocompleteInput extends Component {
       return;
     }
 
-    console.log("fetching data");
     let newContacts = [];
+    console.log(newContacts === undefined || newContacts.length == 0);
+    console.log(
+      "fetching data from ",
+      contactsPath,
+      ", refresh period: ",
+      refreshPeriod
+    );
 
-    // axios
-    //   .get(this.props.contactsPath) // JSON File Path
-    //   .then(response => {
-      newContacts = contacts; //response.data
-    // })
-    // .catch(function(error) {
-    //   console.log(error);
-    // });
+    axios
+      .get(contactsPath) // JSON File Path
+      .then(
+        function onfulfilled(response) {
+          newContacts = response.data;
+          if (newContacts === undefined || newContacts.length == 0) {
+            localStorage.setItem("contacts", JSON.stringify(newContacts));
+            localStorage.setItem("date", new Date().getHours());
 
-    while(newContacts === []);
+            this.setState({
+              dataList: newContacts
+            });
+            
+            return;
+          }
+        },
+        function onrejected(reason) {
+          alert("Warning: contacts are not fetched, autocomplete is unavailable.");
+        }
+      )
+      .catch(error => {
+        console.alert(error);
+      });
+  }
 
-    localStorage.setItem("contacts", JSON.stringify(newContacts));
-    localStorage.setItem("date", new Date().getHours());
+  /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
-    this.setState({
-      dataList: newContacts
-    });
+  componentDidMount() {
+    console.log("Wait till fetch");
+    setTimeout(() => this.fetchContacts(), 3000);
+    // let date = new Date().getHours();
+    // let oldDate = Number(localStorage.getItem("date"));
+    // let oldContacts = localStorage.getItem("contacts");
 
+    // const { contactsPath, refreshPeriod } = this.state;
+
+    // console.log("Cache saved: ", Boolean(oldContacts));
+    // console.log("Refresh period: ", refreshPeriod);
+    // console.log("Number of days since cache: ", date - oldDate);
+
+    // // const refreshPeriod = 1; //TODO: will be converted to this.state and retrieved from props
+
+    // if (oldContacts && date - oldDate < refreshPeriod) {
+    //   console.log("loaded from cache");
+    //   this.setState({
+    //     dataList: JSON.parse(localStorage.getItem("contacts"))
+    //   });
+    //   return;
+    // }
+
+    // let newContacts = [];
+    // console.log(newContacts === undefined || newContacts.length == 0);
+    // console.log(
+    //   "fetching data from ",
+    //   contactsPath,
+    //   ", refresh period: ",
+    //   refreshPeriod
+    // );
+
+    // while (newContacts === undefined || newContacts.length == 0) {
+    //   axios
+    //     .get(contactsPath) // JSON File Path
+    //     .then(response => {
+    //       newContacts = response.data;
+    //     })
+    //     .catch(error => {
+    //       console.log(error);
+    //     });
+    // }
+
+    // console.log("finished loading newContacts");
+
+    // if (newContacts === undefined || newContacts.length == 0) {
+    //   localStorage.setItem("contacts", JSON.stringify(newContacts));
+    //   localStorage.setItem("date", new Date().getHours());
+
+    //   this.setState({
+    //     dataList: newContacts
+    //   });
+    // }
   }
 
   componentDidUpdate() {

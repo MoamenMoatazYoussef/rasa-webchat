@@ -25,7 +25,9 @@ const Conversation = props =>
     <Sender
       sendMessage={props.sendMessage}
       disabledInput={props.disabledInput}
+
       contactsPath={props.contactsPath}
+      refreshPeriod={props.refreshPeriod}
     />
   </div>;
 

@@ -276,7 +276,9 @@ class Widget extends Component {
         openLauncherImage={this.props.openLauncherImage}
         closeImage={this.props.closeImage}
         customComponent={this.props.customComponent}
+
         contactsPath={this.props.contactsPath}
+        refreshPeriod={this.props.refreshPeriod}
       />
     );
   }
