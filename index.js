@@ -58,7 +58,7 @@ plugin.init({
         height: 200
       }
     },
-    storage: "local"
+    storage: "session"
   }
 });
 //TODO: ENDOF Moamen added this

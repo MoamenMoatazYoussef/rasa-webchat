@@ -53,8 +53,8 @@ export default function (inputFieldTextHint, connectingText, storage, docViewer 
       case actionTypes.PULL_SESSION: {
         
         //TODO: Moamen modified this
-        const localSession = null;
-    //const localSession = getLocalSession(storage, SESSION_NAME);
+        // const localSession = null;
+    const localSession = getLocalSession(storage, SESSION_NAME);
 
         // Do not persist connected state
         const connected = state.get('connected');
