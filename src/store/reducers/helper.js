@@ -72,6 +72,8 @@ export function createComponentMessage(component, props, showAvatar) {
   });
 }
 
+//TODO: Moamen modified this
+
 export function getLocalSession(storage, key) {
   // Attempt to get local session from storage
   const cachedSession = storage.getItem(key);
@@ -121,24 +123,31 @@ export function storeLocalSession(storage, key, sid) {
 
 export const storeMessageTo = (storage) => (conversation) => {
   // Store a conversation List to storage
-  const localSession = getLocalSession(storage, SESSION_NAME);
-  const newSession = {
+  //TODO: Moamen modified this
+  const localSession = null;
+  //const localSession = getLocalSession(storage, SESSION_NAME);
+  // const newSession = {
     // Since immutable List is not a native JS object, store conversation as array
-    ...localSession,
-    conversation: [...Array.from(conversation)]
-  }
-  storage.setItem(SESSION_NAME, JSON.stringify(newSession));
+    // ...localSession,
+    // conversation: [...Array.from(conversation)]
+  // }
+  //TODO: Moamen modified this
+        //storage.setItem(SESSION_NAME, JSON.stringify(newSession));
   return conversation
 }
 
 export const storeParamsTo = (storage) => (params) => {
   // Store a params List to storage
-  const localSession = getLocalSession(storage, SESSION_NAME);
+  //TODO: Moamen modified this
+  const localSession = null;
+  //const localSession = getLocalSession(storage, SESSION_NAME);
   const newSession = {
     // Since immutable Map is not a native JS object, store conversation as array
     ...localSession,
     params: params.toJS()
   }
-  storage.setItem(SESSION_NAME, JSON.stringify(newSession));
+  //TODO: Moamen modified this
+        //storage.setItem(SESSION_NAME, JSON.stringify(newSession));
   return params
 }
+

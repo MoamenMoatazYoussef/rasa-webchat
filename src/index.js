@@ -8,7 +8,10 @@ import socket from './socket';
 
 const ConnectedWidget = (props) => {
   const sock = socket(props.socketUrl, props.customData, props.socketPath);
-  const storage = props.params.storage == "session" ? sessionStorage : localStorage
+  
+  //TODO: Moamen modified this
+  //const storage = props.params.storage == "session" ? sessionStorage : localStorage
+  const storage = sessionStorage;
   initStore(
     props.inputTextFieldHint,
     props.connectingText,

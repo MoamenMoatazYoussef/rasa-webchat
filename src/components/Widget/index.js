@@ -22,10 +22,12 @@ import {
 
 import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
-import {
-  storeLocalSession,
-  getLocalSession
-} from "../../store/reducers/helper";
+
+//TODO: Moamen modified this
+// import {
+//   storeLocalSession,
+//   getLocalSession
+// } from "../../store/reducers/helper";
 import { SESSION_NAME, NEXT_MESSAGE } from "constants";
 
 class Widget extends Component {
@@ -70,7 +72,8 @@ class Widget extends Component {
         // storage.clear();
         // Store the received session_id to storage
 
-        storeLocalSession(storage, SESSION_NAME, remote_id);
+        //TODO: Moamen modified this
+        //storeLocalSession(storage, SESSION_NAME, remote_id);
         this.props.dispatch(pullSession());
         this.trySendInitPayload();
       } else {
@@ -120,7 +123,10 @@ class Widget extends Component {
   getSessionId() {
     const { storage } = this.props;
     // Get the local session, check if there is an existing session_id
-    const localSession = getLocalSession(storage, SESSION_NAME);
+
+    //TODO: Moamen modified this
+    //const localSession = getLocalSession(storage, SESSION_NAME);
+    const localSession = null
     const local_id = localSession ? localSession.session_id : null;
     return local_id;
   }

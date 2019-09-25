@@ -411,10 +411,10 @@ class AutocompleteInput extends Component {
     );
 
     axios
-      .get(contactsPath)
+      .post(contactsPath)
       .then(
         response => {
-          newContacts = response.data.results;
+          newContacts = response.data.json_list;
 
           if (newContacts === undefined || newContacts.length == 0) {
             throw new Error("Retrieved list of contacts is empty.");

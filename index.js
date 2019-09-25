@@ -34,11 +34,12 @@ const plugin = {
   }
 };
 
+
 //TODO: Moamen added this
 plugin.init({
   selector: "#webchat",
   initPayload: "/get_started",
-  socketUrl: "http://10.10.19.56:5500/",
+  socketUrl: "http://10.10.19.158:5500/",
   socketPath: "/socket.io/",
   title: "DEV Test",
   inputTextFieldHint: "Type a message...",
@@ -46,7 +47,7 @@ plugin.init({
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
 
-  contactsPath: "https://randomuser.me/api/", //"./src/resources/accounts.json",
+  contactsPath: "http://10.10.19.158:6001/get_users_list", //"./src/resources/accounts.json",
   refreshPeriod: 1,
 
 

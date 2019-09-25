@@ -54,7 +54,9 @@ export default function (storage) {
       }
       // Pull conversation from storage, parsing as immutable List
       case actionTypes.PULL_SESSION: {
-        const localSession = getLocalSession(storage, SESSION_NAME);
+        //TODO: Moamen modified this
+        const localSession = null;
+    //const localSession = getLocalSession(storage, SESSION_NAME);
         if (localSession) {
           return List(localSession.conversation);
         } else {
