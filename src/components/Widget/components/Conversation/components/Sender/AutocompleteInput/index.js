@@ -443,7 +443,6 @@ class AutocompleteInput extends Component {
         }
       )
       .catch(error => {
-        console.log(error.message);
         alert(
           `Warning: Error occured during contacts fetch, autocomplete is unavailable.\nReason: ${error.message}`
           );

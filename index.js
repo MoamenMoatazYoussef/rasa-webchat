@@ -47,7 +47,7 @@ plugin.init({
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
 
-  contactsPath: "http://10.10.19.158:6001/get_users_list", //"./src/resources/accounts.json",
+  contactsPath: "http://10.10.19.158:6001/get_users_list",
   refreshPeriod: 1,
 
 

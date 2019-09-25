@@ -220,8 +220,6 @@ class Widget extends Component {
     const userUttered = event.target.message.value;
     let userUtteredWithMails = userUttered;
 
-    // console.log(event.target.message.mailInput)
-
     if (
       event.target.message.mailInput !== undefined &&
       event.target.message.mailInput !== ""
@@ -229,11 +227,7 @@ class Widget extends Component {
       userUtteredWithMails = event.target.message.mailInput;
     }
 
-    console.log("Hi, you wrote: ", userUttered);
-
     let cleanMessage = this.removeTags(userUttered);
-
-    console.log("But, this will be shown: ", cleanMessage);
 
     if (userUttered) {
       this.props.dispatch(addUserMessage(cleanMessage));
@@ -245,7 +239,6 @@ class Widget extends Component {
   //TODO: Moamen added this
   replaceNamesWithMails(input) {
     let result = input;
-    console.log(result);
     const { mailPositions } = this.state;
 
     if (!mailPositions.length) {
@@ -255,8 +248,6 @@ class Widget extends Component {
     for (let i = 0; i < mailPositions.length; i++) {
       result = result.replace(mailPositions[i].name, mailPositions[i].mail);
     }
-
-    console.log(result);
 
     return result;
   }
