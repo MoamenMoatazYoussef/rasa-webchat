@@ -229,11 +229,11 @@ class Widget extends Component {
       userUtteredWithMails = event.target.message.mailInput;
     }
 
-    console.log("Hi, you wrote: ", userUttered);
+    // console.log("Hi, you wrote: ", userUttered);
 
     let cleanMessage = this.removeTags(userUttered);
 
-    console.log("But, this will be shown: ", cleanMessage);
+    // console.log("But, this will be shown: ", cleanMessage);
 
     if (userUttered) {
       this.props.dispatch(addUserMessage(cleanMessage));
@@ -245,7 +245,7 @@ class Widget extends Component {
   //TODO: Moamen added this
   replaceNamesWithMails(input) {
     let result = input;
-    console.log(result);
+    // console.log(result);
     const { mailPositions } = this.state;
 
     if (!mailPositions.length) {
@@ -256,7 +256,7 @@ class Widget extends Component {
       result = result.replace(mailPositions[i].name, mailPositions[i].mail);
     }
 
-    console.log(result);
+    // console.log(result);
 
     return result;
   }
