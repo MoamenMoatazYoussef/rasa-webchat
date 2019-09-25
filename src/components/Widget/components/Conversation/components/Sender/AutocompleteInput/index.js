@@ -168,6 +168,9 @@ class AutocompleteInput extends Component {
           console.log(e);
           newInput = event.target.value;
         }
+        this.setState({
+          autocompleteState: false
+        });
         return newInput;
     }
   }

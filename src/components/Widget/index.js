@@ -23,7 +23,6 @@ import {
 import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
-//TODO: Moamen modified this
 import {
   storeLocalSession,
   getLocalSession
@@ -72,7 +71,6 @@ class Widget extends Component {
         // storage.clear();
         // Store the received session_id to storage
 
-        //TODO: Moamen modified this
         storeLocalSession(storage, SESSION_NAME, remote_id);
         this.props.dispatch(pullSession());
         this.trySendInitPayload();
@@ -124,9 +122,7 @@ class Widget extends Component {
     const { storage } = this.props;
     // Get the local session, check if there is an existing session_id
 
-    //TODO: Moamen modified this
     const localSession = getLocalSession(storage, SESSION_NAME);
-    // const localSession = null
     const local_id = localSession ? localSession.session_id : null;
     return local_id;
   }
@@ -230,13 +226,17 @@ class Widget extends Component {
       event.target.message.mailInput !== undefined &&
       event.target.message.mailInput !== ""
     ) {
-      userUtteredWithMails = event.target.message.mailInput; //this.replaceNamesWithMails(userUttered);
+      userUtteredWithMails = event.target.message.mailInput;
     }
 
-    // console.log(userUtteredWithMails);
+    console.log("Hi, you wrote: ", userUttered);
+
+    let cleanMessage = this.removeTags(userUttered);
+
+    console.log("But, this will be shown: ", cleanMessage);
 
     if (userUttered) {
-      this.props.dispatch(addUserMessage(userUttered));
+      this.props.dispatch(addUserMessage(cleanMessage));
       this.props.dispatch(emitUserMessage(userUtteredWithMails));
     }
     event.target.message.value = "";
@@ -259,6 +259,10 @@ class Widget extends Component {
     console.log(result);
 
     return result;
+  }
+
+  removeTags(input) {
+    return input.replace(/@/g, "").replace(/\f/g, "");
   }
   //TODO: ENDOF Moamen added this
 

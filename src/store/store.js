@@ -5,7 +5,6 @@ import { SESSION_NAME } from 'constants';
 import behavior from "./reducers/behaviorReducer";
 import messages from "./reducers/messagesReducer";
 
-//TODO: Moamen modified this
 import { getLocalSession } from './reducers/helper';
 import * as actionTypes from './actions/actionTypes';
 
@@ -13,12 +12,10 @@ let store = "call initStore first";
 
 function initStore(hintText, connectingText, socket, storage, docViewer = false) {
   const customMiddleWare = (store) => next => (action) => {
-    //TODO: Moamen modified this
-    // const session_id = null;
     const session_id = (getLocalSession(storage, SESSION_NAME)? getLocalSession(storage, SESSION_NAME).session_id: null);
     switch (action.type) {
       case actionTypes.EMIT_NEW_USER_MESSAGE: {
-        // console.log(action.text);
+        console.log("And, this will be sent: ", action.text);
         socket.emit("user_uttered", { message: action.text, customData: socket.customData, session_id });
       }
       case actionTypes.GET_OPEN_STATE: {
