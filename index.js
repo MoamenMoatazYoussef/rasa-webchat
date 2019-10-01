@@ -37,6 +37,7 @@ const plugin = {
 
 //TODO: Moamen added this
 plugin.init({
+  interval: 1000,
   selector: "#webchat",
   initPayload: "/get_started",
   socketUrl: "http://10.10.19.158:5500/",
