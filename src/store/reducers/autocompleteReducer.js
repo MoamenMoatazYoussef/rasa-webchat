@@ -13,7 +13,7 @@ export default function () {
   return function reducer(state = initialState, action) {
     switch (action.type) {
       case actionTypes.SET_AUTOCOMPLETE_LIST: {
-        return state.update('dataList', () => action.list);
+        return state.update('dataList', () => action.dataList);
       }
 
       case actionTypes.SET_AUTOCOMPLETE_CALL_DESTINATION: {

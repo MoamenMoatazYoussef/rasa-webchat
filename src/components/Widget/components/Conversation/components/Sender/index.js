@@ -3,20 +3,28 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import AutocompleteInput from "./AutocompleteInput";
+import ListFetchAndCacheHandler from "../../../../../Helpers/ListFetchAndCacheHandler";
 
 import send from "assets/send_button.svg";
 import "./style.scss";
 
-const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, contactsPath, refreshPeriod }) => (
+const Sender = ({
+  sendMessage,
+  inputFieldTextHint,
+  disabledInput,
+  callDestination,
+  refreshPeriod
+}) => (
   <form className="sender" onSubmit={sendMessage}>
+    <ListFetchAndCacheHandler
+      callDestination={callDestination}
+      refreshPeriod={refreshPeriod}
+    />
     <AutocompleteInput
       inputFieldTextHint={inputFieldTextHint}
       disabledInput={disabledInput}
       autoFocus
       autoComplete="off"
-
-      contactsPath={contactsPath}
-      refreshPeriod={refreshPeriod}
     />
     <button type="submit" className="send">
       <img src={send} className="send-icon" alt="send" />

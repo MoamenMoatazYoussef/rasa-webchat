@@ -160,10 +160,10 @@ export function pullSession() {
 }
 
 // TODO: Moamen Added This
-export function setAutocompleteList(list) {
+export function setAutocompleteList(dataList) {
   return {
     type: actions.SET_AUTOCOMPLETE_LIST,
-    list
+    dataList
   };
 }
 

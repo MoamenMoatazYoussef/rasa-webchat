@@ -1,20 +1,37 @@
+import {
+    Component
+} from 'react';
+
+import {
+    setAutocompleteList,
+    setAutocompleteCallDestination,
+    // setAutocompleteElementsToReplace,
+    // setAutocompleteState,
+    // setAutocompleteCurrentInput,
+    // setAutocompleteSelected,
+    // setAutocompletePositions,
+    // setAutocompleteAlteredInput
+  } from "actions";
+
 import axios from "axios";
 
 import {
     connect
 } from "react-redux";
 
-class ListFetchAndCacheHandler {
-    constructor(callDestination, refreshPeriod) {
-        this.callDestination = callDestination;
-        this.refreshPeriod = refreshPeriod;
+class ListFetchAndCacheHandler extends Component {
+    constructor(props) {
+        super(props);
+
+        console.log(props);
 
         this.checkElementStructure = this.checkElementStructure.bind(this);
         this.checkListStructure = this.checkListStructure.bind(this);
         this.fetchElements = this.fetchElements.bind(this);
-
-        this.fetchElements();
     }
+
+    setAutocompleteList = dataList => this.props.setAutocompleteList(dataList);
+    setAutocompleteCallDestination = callDestination => this.props.setAutocompleteCallDestination(callDestination);
 
     checkElementStructure(element, attributes) {
         let temp = element;
@@ -39,16 +56,14 @@ class ListFetchAndCacheHandler {
         return true;
     }
 
-    fetchElements() {
+    fetchElements(callDestination, refreshPeriod) {
         let date = new Date().getHours();
         let oldDate = Number(localStorage.getItem("date"));
         let oldElements = localStorage.getItem("elements");
 
-        if (oldElements && date - oldDate < this.refreshPeriod) {
+        if (oldElements && date - oldDate < refreshPeriod) {
             console.log("loaded from cache");
-            this.setState({ //TODO: push list to state
-                dataList: JSON.parse(localStorage.getItem("elements"))
-            });
+            this.setAutocompleteList(JSON.parse(localStorage.getItem("elements")));
             return;
         }
 
@@ -56,13 +71,13 @@ class ListFetchAndCacheHandler {
 
         console.log(
             "fetching data from ",
-            this.callDestination,
+            callDestination,
             ", refresh period: ",
-            this.refreshPeriod
+            refreshPeriod
         );
 
         axios
-            .post(this.callDestination)
+            .post(callDestination)
             .then(
                 response => {
                     newElements = response.data.json_list;
@@ -75,9 +90,9 @@ class ListFetchAndCacheHandler {
                         throw new Error("Invalid element structure.");
                     }
 
-                    this.setState({ //TODO: push list to state
-                        dataList: newElements
-                    });
+                    console.log('hiiii', newElements);
+
+                    this.setAutocompleteList(newElements);
 
                     localStorage.setItem("elements", JSON.stringify(newElements));
                     localStorage.setItem("date", new Date().getHours());
@@ -86,21 +101,30 @@ class ListFetchAndCacheHandler {
                 },
                 reason => {
                     alert(
-                        `Warning: elements are not fetched, autocomplete is unavailable. \nReason: ${reason.message}`
+                        `Warning: Response Rejected, Elements are not fetched, autocomplete is unavailable. \nReason: ${reason.message}`
                     );
+                    this.setAutocompleteList([]);
                 }
             )
             .catch(error => {
                 alert(
                     `Warning: Error occured during elements fetch, autocomplete is unavailable.\nReason: ${error.message}`
                 );
+                this.setAutocompleteList([]);
             });
+    }
+
+    render() {
+        this.fetchElements(this.props.callDestination, this.props.refreshPeriod);
+        return null;
     }
 }
 
+//TODO: fix this, don't render this class and use mapStateToProps
+
 const mapStateToProps = state => ({
-    callDestination: state.autocomplete.get("connected"),
-    refreshPeriod: state.autocomplete.get("refreshPeriod")
+    // callDestination: state.autocomplete.get("callDestination"),
+    // refreshPeriod: state.autocomplete.get("refreshPeriod")
 });
 
 const mapDispatchToProps = dispatch => ({

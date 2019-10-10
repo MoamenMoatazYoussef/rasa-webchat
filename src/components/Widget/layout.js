@@ -39,7 +39,7 @@ const WidgetLayout = (props) => {
           closeImage={props.closeImage}
           customComponent={props.customComponent}
 
-          contactsPath={props.contactsPath}
+          callDestination={props.callDestination}
           refreshPeriod={props.refreshPeriod}
         />
       }

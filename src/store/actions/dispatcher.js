@@ -100,8 +100,8 @@ export function pullSession() {
 }
 
 // TODO: Moamen added this
-export function setAutocompleteList(list) {
-  store.dispatch(actions.setAutocompleteList(list));
+export function setAutocompleteList(dataList) {
+  store.dispatch(actions.setAutocompleteList(dataList));
 }
 
 export function setAutocompleteCallDestination(destination) {

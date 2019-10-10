@@ -23,7 +23,7 @@ import {
 import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
-import Splitter from "../Helpers/Splitter";
+import ListFetchAndCacheHandler from "../Helpers/ListFetchAndCacheHandler";
 
 import {
   storeLocalSession,
@@ -40,6 +40,7 @@ class Widget extends Component {
         this.dispatchMessage(this.messages.shift());
       }
     }, this.props.interval);
+
   }
 
   componentDidMount() {
@@ -230,8 +231,6 @@ class Widget extends Component {
       userUtteredWithMails = event.target.message.mailInput;
     }
 
-    debugger;
-
     let cleanMessage = this.removeTags(userUttered);
 
     if (userUttered) {
@@ -240,6 +239,12 @@ class Widget extends Component {
     }
     event.target.message.value = "";
   };
+
+  //TODO: Moamen added this
+  removeTags(input) {
+    return input.replace(/@/g, "").replace(/\f/g, "");
+  }
+  //TODO: ENDOF Moamen added this
 
   render() {
     return (
@@ -261,8 +266,7 @@ class Widget extends Component {
         openLauncherImage={this.props.openLauncherImage}
         closeImage={this.props.closeImage}
         customComponent={this.props.customComponent}
-
-        contactsPath={this.props.contactsPath}
+        callDestination={this.props.callDestination}
         refreshPeriod={this.props.refreshPeriod}
       />
     );

@@ -14,7 +14,6 @@ import {
 } from "actions";
 
 import Replacer from "../../../../../../Helpers/Replacer";
-import ListFetchAndCacheHandler from "../../../../../../Helpers/ListFetchAndCacheHandler";
 
 import "../style.scss";
 import "./style.scss";
@@ -29,7 +28,7 @@ class AutocompleteInput extends Component {
     super(props);
 
     this.state = {
-      autocompleteList: []
+      filteredList: []
     };
 
     this.selectedStrings = [];
@@ -110,8 +109,9 @@ class AutocompleteInput extends Component {
   }
 
   onClick(i, cursorPosition, event) {
-    const { autocompleteList, currentInput } = this.props;
-    const selectedOption = autocompleteList[i];
+    const { currentInput } = this.props;
+    const { filteredList } = this.state;
+    const selectedOption = filteredList[i];
 
     const autocompleteStart = this.getAutocompleteStart(
       currentInput,
@@ -150,7 +150,7 @@ class AutocompleteInput extends Component {
     this.setAutocompleteSelected(0);
 
     this.setState({
-      autocompleteList: []
+      filteredList: []
     });
   }
 
@@ -193,21 +193,21 @@ class AutocompleteInput extends Component {
   /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
 
   performNavigation(event) {
-    const { autocompleteList } = this.state;
+    const { filteredList } = this.state;
     const { selected } = this.props;
 
     switch (event.keyCode) {
       case KEY_UP:
         event.preventDefault();
         this.setAutocompleteSelected(
-          selected === 0 ? autocompleteList.length - 1 : prevState.selected - 1
+          selected === 0 ? filteredList.length - 1 : prevState.selected - 1
         );
         return;
 
       case KEY_DOWN:
         event.preventDefault();
         this.setAutocompleteSelected(
-          (prevState.selected + 1) % autocompleteList.length
+          (prevState.selected + 1) % filteredList.length
         );
         return;
 
@@ -233,7 +233,7 @@ class AutocompleteInput extends Component {
       startIndex + 1,
       event.target.selectionStart
     );
-    const dataList = this.props.dataList;
+    const { dataList } = this.props;
     const matchingWords = this.matchWithArray(pattern, dataList);
 
     this.autocompleteStart = startIndex;
@@ -244,7 +244,7 @@ class AutocompleteInput extends Component {
     this.setAutocompleteState(true);
 
     this.setState({
-      autocompleteList: matchingWords
+      filteredList: matchingWords
     });
   }
 
@@ -364,6 +364,7 @@ class AutocompleteInput extends Component {
 
   componentDidMount() {
     // ListFetchAndCacheHandler.fetchElements();
+    console.log(this.props.dataList);
   }
 
   componentDidUpdate() {
@@ -381,10 +382,11 @@ class AutocompleteInput extends Component {
       autocompleteState,
       selected
     } = this.props;
-    const { autocompleteList, pageStart, pageEnd } = this.state;
+    const { pageStart, pageEnd, filteredList } = this.state;
 
     return (
       <div className=" w-100">
+
         <Manager tag={true}>
           <div className="position-relative">
             <Reference>

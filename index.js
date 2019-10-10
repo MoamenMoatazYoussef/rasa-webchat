@@ -26,7 +26,7 @@ const plugin = {
         closeImage={args.closeImage}
         docViewer={args.docViewer}
 
-        contactsPath={args.contactsPath}
+        callDestination={args.callDestination}
         refreshPeriod={args.refreshPeriod}
 
       />, document.querySelector(args.selector)
@@ -47,7 +47,7 @@ plugin.init({
   connectingText: "Waiting for server...",
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
-  contactsPath: "http://10.10.19.158:6001/get_users_list", //"./src/resources/accounts.json",
+  callDestination: "http://10.10.19.158:6001/get_users_list", //"./src/resources/accounts.json",
   refreshPeriod: 1,
   params: {
     images: {
