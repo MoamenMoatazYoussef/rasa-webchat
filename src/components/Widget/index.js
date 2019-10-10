@@ -23,6 +23,8 @@ import {
 import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
+import Splitter from "../Helpers/Splitter";
+
 import {
   storeLocalSession,
   getLocalSession
@@ -218,7 +220,8 @@ class Widget extends Component {
   handleMessageSubmit = event => {
     event.preventDefault();
     const userUttered = event.target.message.value;
-    let userUtteredWithMails = userUttered;
+    let userUtteredWithMails;
+    // const { normalInput, alteredInput } = Splitter(event.target.message.value);
 
     if (
       event.target.message.mailInput !== undefined &&
@@ -226,6 +229,8 @@ class Widget extends Component {
     ) {
       userUtteredWithMails = event.target.message.mailInput;
     }
+
+    debugger;
 
     let cleanMessage = this.removeTags(userUttered);
 
@@ -235,27 +240,6 @@ class Widget extends Component {
     }
     event.target.message.value = "";
   };
-
-  //TODO: Moamen added this
-  replaceNamesWithMails(input) {
-    let result = input;
-    const { mailPositions } = this.state;
-
-    if (!mailPositions.length) {
-      return input;
-    }
-
-    for (let i = 0; i < mailPositions.length; i++) {
-      result = result.replace(mailPositions[i].name, mailPositions[i].mail);
-    }
-
-    return result;
-  }
-
-  removeTags(input) {
-    return input.replace(/@/g, "").replace(/\f/g, "");
-  }
-  //TODO: ENDOF Moamen added this
 
   render() {
     return (

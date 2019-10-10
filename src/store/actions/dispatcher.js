@@ -1,4 +1,6 @@
-import { store } from '../store';
+import {
+  store
+} from '../store';
 import * as actions from './index';
 
 export function isOpen() {
@@ -95,4 +97,37 @@ export function dropMessages() {
 
 export function pullSession() {
   store.dispatch(actions.pullSession());
+}
+
+// TODO: Moamen added this
+export function setAutocompleteList(list) {
+  store.dispatch(actions.setAutocompleteList(list));
+}
+
+export function setAutocompleteCallDestination(destination) {
+  store.dispatch(actions.setAutocompleteCallDestination(destination));
+}
+
+export function setAutocompleteElementsToReplace(elements) {
+  store.dispatch(actions.setAutocompleteElementsToReplace(elements));
+}
+
+export function setAutocompleteState(autocompleteState) {
+  store.dispatch(actions.setAutocompleteState(autocompleteState));
+}
+
+export function setAutocompleteCurrentInput(input) {
+  store.dispatch(actions.setAutocompleteCurrentInput(input));
+}
+
+export function setAutocompleteSelected(selected) {
+  store.dispatch(actions.setAutocompleteSelected(selected));
+}
+
+export function setAutocompletePositions(positions) {
+  store.dispatch(actions.setAutocompletePositions(positions));
+}
+
+export function setAutocompleteAlteredInput(alteredInput) {
+  store.dispatch(actions.setAutocompleteAlteredInput(alteredInput));
 }

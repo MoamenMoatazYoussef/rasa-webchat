@@ -4,6 +4,7 @@ import { SESSION_NAME } from 'constants';
 
 import behavior from "./reducers/behaviorReducer";
 import messages from "./reducers/messagesReducer";
+import autocomplete from "./reducers/autocompleteReducer";
 
 import { getLocalSession } from './reducers/helper';
 import * as actionTypes from './actions/actionTypes';
@@ -30,7 +31,8 @@ function initStore(hintText, connectingText, socket, storage, docViewer = false)
   };
   const reducer = combineReducers({ 
     behavior: behavior(hintText, connectingText, storage, docViewer),
-    messages: messages(storage)
+    messages: messages(storage),
+    autocomplete: autocomplete(storage)
   });
 
   /* eslint-disable no-underscore-dangle */
