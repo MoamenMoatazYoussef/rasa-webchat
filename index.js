@@ -42,12 +42,12 @@ plugin.init({
   initPayload: "/get_started",
   socketUrl: "http://10.10.19.158:5500/",
   socketPath: "/socket.io/",
-  title: "DEV Test",
+  title: "Moamen is Awesome",
   inputTextFieldHint: "Type a message...",
   connectingText: "Waiting for server...",
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
-  contactsPath: "http://10.10.19.158:6001/get_users_list", //"./src/resources/accounts.json",
+  contactsPath: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
   refreshPeriod: 1,
   params: {
     images: {

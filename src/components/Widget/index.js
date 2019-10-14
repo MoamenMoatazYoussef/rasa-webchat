@@ -73,7 +73,7 @@ class Widget extends Component {
 
         storeLocalSession(storage, SESSION_NAME, remote_id);
         this.props.dispatch(pullSession());
-        this.trySendInitPayload();
+        // this.trySendInitPayload();
       } else {
         // If this is an existing session, it's possible we changed pages and want to send a
         // user message when we land.
@@ -106,7 +106,7 @@ class Widget extends Component {
 
   componentDidUpdate() {
     this.props.dispatch(pullSession());
-    this.trySendInitPayload();
+    // this.trySendInitPayload();
     if (this.props.embedded && this.props.initialized) {
       this.props.dispatch(showChat());
       this.props.dispatch(openChat());
