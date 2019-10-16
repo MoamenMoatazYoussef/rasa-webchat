@@ -51,8 +51,31 @@ class Widget extends Component {
 
     // Request a session from server
     const local_id = this.getSessionId();
+
+    // TODO: Moamen Modified this
     socket.on("connect", () => {
-      socket.emit("session_request", { session_id: local_id });
+      const dateInSeconds = new Date().getSeconds();
+      const lastSessionId = storage.getItem("last-session-id");
+      const lastSessionPeriod = storage.getItem("last-session-period");
+
+      console.log("Current seconds", dateInSeconds, "Last seconds", lastSessionPeriod);
+
+      if(Math.abs(dateInSeconds - lastSessionPeriod) < 10) {
+        storeLocalSession(storage, SESSION_NAME, lastSessionId);
+
+        const lastSession = JSON.parse(storage.getItem(SESSION_NAME));
+        const lastMessage = lastSession.conversation[lastSession.conversation.length - 1];
+
+        console.log("Last message:", lastMessage);
+
+        socket.emit("user_uttered", {
+          message: lastMessage.text,
+          customData: {},
+          session_id: lastSessionId ? lastSessionId : local_id 
+        });
+      } else {
+        socket.emit("session_request", { session_id: local_id });
+      }
     });
 
     // When session_confirm is received from the server:
@@ -91,10 +114,15 @@ class Widget extends Component {
       }
     });
 
+    // TODO: Moamen Modified this
     socket.on("disconnect", reason => {
       console.log(reason);
+
+      storage.setItem("last-session-id", JSON.stringify(socket.id));
+      storage.setItem("last-session-period", new Date().getSeconds());
+
       if (reason !== "io client disconnect") {
-        this.props.dispatch(disconnectServer());
+        // this.props.dispatch(disconnectServer());
       }
     });
 
@@ -121,6 +149,7 @@ class Widget extends Component {
   getSessionId() {
     const { storage } = this.props;
     // Get the local session, check if there is an existing session_id
+
 
     const localSession = getLocalSession(storage, SESSION_NAME);
     const local_id = localSession ? localSession.session_id : null;
