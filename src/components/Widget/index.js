@@ -54,28 +54,24 @@ class Widget extends Component {
 
     // TODO: Moamen Modified this
     socket.on("connect", () => {
-      const dateInSeconds = new Date().getSeconds();
-      const lastSessionId = storage.getItem("last-session-id");
-      const lastSessionPeriod = storage.getItem("last-session-period");
+      // const dateInSeconds = new Date().getSeconds();
+      // const lastSessionId = JSON.parse(storage.getItem("last-session-id"));
+      // const lastSessionPeriod = JSON.parse(storage.getItem("last-session-period"));
 
-      console.log("Current seconds", dateInSeconds, "Last seconds", lastSessionPeriod);
+      // if(lastSessionId && lastSessionPeriod && Math.abs(dateInSeconds - lastSessionPeriod) < 5) {
+      //   storeLocalSession(storage, SESSION_NAME, lastSessionId);
 
-      if(Math.abs(dateInSeconds - lastSessionPeriod) < 10) {
-        storeLocalSession(storage, SESSION_NAME, lastSessionId);
+      //   const lastSession = JSON.parse(storage.getItem(SESSION_NAME));
+      //   const lastMessage = lastSession.conversation[lastSession.conversation.length - 1];
 
-        const lastSession = JSON.parse(storage.getItem(SESSION_NAME));
-        const lastMessage = lastSession.conversation[lastSession.conversation.length - 1];
-
-        console.log("Last message:", lastMessage);
-
-        socket.emit("user_uttered", {
-          message: lastMessage.text,
-          customData: {},
-          session_id: lastSessionId ? lastSessionId : local_id 
-        });
-      } else {
+      //   socket.emit("message", {
+      //     message: lastMessage.text,
+      //     customData: {},
+      //     session_id: lastSessionId ? lastSessionId : local_id 
+      //   });
+      // } else {
         socket.emit("session_request", { session_id: local_id });
-      }
+      // }
     });
 
     // When session_confirm is received from the server:
@@ -118,11 +114,11 @@ class Widget extends Component {
     socket.on("disconnect", reason => {
       console.log(reason);
 
-      storage.setItem("last-session-id", JSON.stringify(socket.id));
-      storage.setItem("last-session-period", new Date().getSeconds());
+      // storage.setItem("last-session-id", JSON.stringify(this.getSessionId()));
+      // storage.setItem("last-session-period", new Date().getSeconds());
 
       if (reason !== "io client disconnect") {
-        // this.props.dispatch(disconnectServer());
+        this.props.dispatch(disconnectServer());
       }
     });
 
@@ -152,6 +148,8 @@ class Widget extends Component {
 
 
     const localSession = getLocalSession(storage, SESSION_NAME);
+
+    console.log(localSession);
     const local_id = localSession ? localSession.session_id : null;
     return local_id;
   }
@@ -185,7 +183,7 @@ class Widget extends Component {
       // check that session_id is confirmed
       if (!session_id) return;
       console.log("sending init payload", session_id);
-      socket.emit("user_uttered", {
+      socket.emit("message", {
         message: initPayload,
         customData,
         session_id: session_id
@@ -199,6 +197,9 @@ class Widget extends Component {
   };
 
   dispatchMessage(message) {
+
+    message = { text: message.text };
+    
     if (Object.keys(message).length === 0) {
       return;
     }

@@ -11,7 +11,7 @@ const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, contactsPath, 
   <form className="sender" onSubmit={sendMessage}>
     <AutocompleteInput
       inputFieldTextHint={inputFieldTextHint}
-      disabledInput={disabledInput}
+      // disabledInput={disabledInput}
       autoFocus
       autoComplete="off"
 

@@ -35,31 +35,31 @@ const plugin = {
 };
 
 
-//TODO: Moamen added this
-plugin.init({
-  interval: 1000,
-  selector: "#webchat",
-  initPayload: "/get_started",
-  socketUrl: "http://10.10.19.158:5500/",
-  socketPath: "/socket.io/",
-  title: "Moamen is Awesome",
-  inputTextFieldHint: "Type a message...",
-  connectingText: "Waiting for server...",
-  hideWhenNotConnected: false, //TODO: Moamen added this
-  docViewer: false,
-  contactsPath: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
-  refreshPeriod: 1,
-  params: {
-    images: {
-      dims: {
-        width: 300,
-        height: 200
-      }
-    },
-    storage: "session"
-  }
-});
-//TODO: ENDOF Moamen added this
+// //TODO: Moamen added this
+// plugin.init({
+//   interval: 1000,
+//   selector: "#webchat",
+//   initPayload: "/get_started",
+//   socketUrl: "http://10.10.19.158:8080/",
+//   socketPath: "/socket.io/",
+//   title: "Moamen is Awesome",
+//   inputTextFieldHint: "Type a message...",
+//   connectingText: "Waiting for server...",
+//   hideWhenNotConnected: false, //TODO: Moamen added this
+//   docViewer: false,
+//   contactsPath: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
+//   refreshPeriod: 1,
+//   params: {
+//     images: {
+//       dims: {
+//         width: 300,
+//         height: 200
+//       }
+//     },
+//     storage: "session"
+//   }
+// });
+// //TODO: ENDOF Moamen added this
 
 export {
   plugin as default,
