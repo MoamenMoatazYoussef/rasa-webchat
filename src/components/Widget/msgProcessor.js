@@ -22,7 +22,13 @@ export function isImage(message) {
 }
 
 export function isText(message) {
+  console.log(Object.keys(message).length === 1);
+  console.log(Object.keys(message).includes('text'));
   return Object.keys(message).length === 1 && Object.keys(message).includes('text');
+}
+
+export function isArrayOfTexts(message) {
+  return true;
 }
 
 export function isQR(message) {

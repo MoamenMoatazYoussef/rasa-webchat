@@ -20,7 +20,7 @@ import {
   pullSession
 } from "actions";
 
-import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
+import { isSnippet, isVideo, isImage, isQR, isText, isArrayOfTexts } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
 import {
@@ -198,11 +198,18 @@ class Widget extends Component {
 
   dispatchMessage(message) {
 
-    message = { text: message.text };
+    // message = { text: message.text };
+    console.log(message);
     
     if (Object.keys(message).length === 0) {
       return;
     }
+
+    if(isArrayOfTexts(message)) {
+      message.forEach(element => {
+        this.props.dispatch(addResponseMessage(element.text));
+      });
+    } else
 
     if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
@@ -236,6 +243,7 @@ class Widget extends Component {
       );
     } else {
       // some custom message
+
       const props = message;
       if (this.props.customComponent) {
         this.props.dispatch(
