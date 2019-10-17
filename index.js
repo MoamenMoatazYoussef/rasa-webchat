@@ -39,9 +39,9 @@ const plugin = {
 plugin.init({
   interval: 1000,
   selector: "#webchat",
-  initPayload: "/get_started",
+  initPayload: "/help",
   socketUrl: "http://10.10.19.158:8080/",
-  socketPath: "/socket.io/",
+  // socketPath: "/socket.io/",
   title: "Moamen is Awesome",
   inputTextFieldHint: "Type a message...",
   connectingText: "Waiting for server...",

@@ -29,7 +29,7 @@ const Header = ({
       {subtitle && <span>{subtitle}</span>}
     </div>
   {
-    !connected && false &&
+    !connected &&
     <span className="loading">
       {connectingText}
     </span>

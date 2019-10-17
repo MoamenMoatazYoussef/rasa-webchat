@@ -44,7 +44,14 @@ class Widget extends Component {
     const { socket, storage } = this.props;
 
     socket.on("bot_uttered", botUttered => {
-      this.messages.push(botUttered);
+      console.log("Printing after botUttered", botUttered[0] ,botUttered[0].recipient_id, this.socketId );
+
+      if(botUttered.length == 0) {
+        return;
+      }
+
+      if(this.socketId == botUttered[0].recipient_id)
+        this.messages.push(botUttered);
     });
 
     this.props.dispatch(pullSession());
@@ -53,7 +60,7 @@ class Widget extends Component {
     const local_id = this.getSessionId();
 
     // TODO: Moamen Modified this
-    socket.on("connect", () => {
+    // socket.on("connect", () => {
       // const dateInSeconds = new Date().getSeconds();
       // const lastSessionId = JSON.parse(storage.getItem("last-session-id"));
       // const lastSessionPeriod = JSON.parse(storage.getItem("last-session-period"));
@@ -72,11 +79,12 @@ class Widget extends Component {
       // } else {
         socket.emit("session_request", { session_id: local_id });
       // }
-    });
+    // });
 
     // When session_confirm is received from the server:
     socket.on("session_confirm", remote_id => {
       console.log(`session_confirm:${socket.id} session_id:${remote_id}`);
+      this.socketId = remote_id;
 
       // Store the initial state to both the redux store and the storage, set connected to true
       this.props.dispatch(connectServer());
@@ -92,7 +100,7 @@ class Widget extends Component {
 
         storeLocalSession(storage, SESSION_NAME, remote_id);
         this.props.dispatch(pullSession());
-        // this.trySendInitPayload();
+        this.trySendInitPayload();
       } else {
         // If this is an existing session, it's possible we changed pages and want to send a
         // user message when we land.
@@ -130,7 +138,7 @@ class Widget extends Component {
 
   componentDidUpdate() {
     this.props.dispatch(pullSession());
-    // this.trySendInitPayload();
+    this.trySendInitPayload();
     if (this.props.embedded && this.props.initialized) {
       this.props.dispatch(showChat());
       this.props.dispatch(openChat());
