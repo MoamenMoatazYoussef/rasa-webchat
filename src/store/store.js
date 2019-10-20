@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from "redux";
 
-import { SESSION_NAME } from 'constants';
+import { SESSION_NAME, LOCAL_ID } from 'constants';
 
 import behavior from "./reducers/behaviorReducer";
 import messages from "./reducers/messagesReducer";
@@ -15,7 +15,16 @@ function initStore(hintText, connectingText, socket, storage, docViewer = false)
     const session_id = (getLocalSession(storage, SESSION_NAME)? getLocalSession(storage, SESSION_NAME).session_id: null);
     switch (action.type) {
       case actionTypes.EMIT_NEW_USER_MESSAGE: {
-        socket.emit("message", action.text);
+        socket.emit("message", 
+
+
+        { 
+          text: action.text,
+          session_id: LOCAL_ID['id']
+        }
+
+
+        );
       }
       case actionTypes.GET_OPEN_STATE: {
         return store.getState().behavior.get("isChatOpen");

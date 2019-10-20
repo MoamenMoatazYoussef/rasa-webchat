@@ -27,7 +27,9 @@ import {
   storeLocalSession,
   getLocalSession
 } from "../../store/reducers/helper";
-import { SESSION_NAME, NEXT_MESSAGE } from "constants";
+import { SESSION_NAME, NEXT_MESSAGE, LOCAL_ID } from "constants";
+
+
 
 class Widget extends Component {
   constructor(props) {
@@ -57,33 +59,30 @@ class Widget extends Component {
 
     // Request a session from server
     const local_id = this.getSessionId();
+    LOCAL_ID['id'] = local_id;
+    console.log("Current ID", LOCAL_ID['id']);
 
     // TODO: Moamen Modified this
-    // socket.on("connect", () => {
-      // const dateInSeconds = new Date().getSeconds();
-      // const lastSessionId = JSON.parse(storage.getItem("last-session-id"));
-      // const lastSessionPeriod = JSON.parse(storage.getItem("last-session-period"));
+    socket.on("connect", () => {
+      const lastSessionId = JSON.parse(localStorage.getItem("LOCAL_ID"));
+      console.log(lastSessionId != null);
 
-      // if(lastSessionId && lastSessionPeriod && Math.abs(dateInSeconds - lastSessionPeriod) < 5) {
-      //   storeLocalSession(storage, SESSION_NAME, lastSessionId);
-
-      //   const lastSession = JSON.parse(storage.getItem(SESSION_NAME));
-      //   const lastMessage = lastSession.conversation[lastSession.conversation.length - 1];
-
-      //   socket.emit("message", {
-      //     message: lastMessage.text,
-      //     customData: {},
-      //     session_id: lastSessionId ? lastSessionId : local_id 
-      //   });
-      // } else {
+      if(lastSessionId) {
+        console.log("Last session id: ", lastSessionId);
+        LOCAL_ID['id'] = lastSessionId;
+      } else {
         socket.emit("session_request");
-      // }
-    // });
+        // localStorage.clear();
+      }
+    });
 
     // When session_confirm is received from the server:
     socket.on("session_confirm", remote_id => {
       console.log(`session_confirm:${socket.id} session_id:${remote_id}`);
       this.socketId = remote_id;
+
+      LOCAL_ID['id'] = remote_id;
+      console.log("Now, current ID", LOCAL_ID['id']);
 
       // Store the initial state to both the redux store and the storage, set connected to true
       this.props.dispatch(connectServer());
@@ -125,7 +124,7 @@ class Widget extends Component {
       // storage.setItem("last-session-period", new Date().getSeconds());
 
       if (reason !== "io client disconnect") {
-        this.props.dispatch(disconnectServer());
+        // this.props.dispatch(disconnectServer());
       }
     });
 
@@ -147,6 +146,9 @@ class Widget extends Component {
   componentWillUnmount() {
     const { socket } = this.props;
     socket.close();
+
+
+    localStorage.removeItem("LOCAL_ID");
   }
 
   getSessionId() {
@@ -190,11 +192,10 @@ class Widget extends Component {
       // check that session_id is confirmed
       if (!session_id) return;
       console.log("sending init payload", session_id);
-      socket.emit("message", {
-        message: initPayload,
-        customData,
-        session_id: session_id
-      });
+      socket.emit("message", { 
+          text: initPayload,
+          session_id: LOCAL_ID['id']
+        });
       this.props.dispatch(initialize());
     }
   };

@@ -79,7 +79,7 @@ ConnectedWidget.defaultProps = {
   connectingText: 'Waiting for server...',
   fullScreenMode: false,
   hideWhenNotConnected: true,
-  socketUrl: 'http://localhost',
+  // socketUrl: 'http://localhost',
   badge: 0,
   embedded: false,
   params: {

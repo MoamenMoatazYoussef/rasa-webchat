@@ -111,3 +111,9 @@ export const PROP_TYPES = {
   })
 
 };
+
+
+// TODO: Moamen added this
+export const LOCAL_ID = {
+  id: null
+};
