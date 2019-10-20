@@ -50,7 +50,6 @@ class Widget extends Component {
         return;
       }
 
-      if(this.socketId == botUttered[0].recipient_id)
         this.messages.push(botUttered);
     });
 
@@ -77,7 +76,7 @@ class Widget extends Component {
       //     session_id: lastSessionId ? lastSessionId : local_id 
       //   });
       // } else {
-        socket.emit("session_request", { session_id: local_id });
+        socket.emit("session_request");
       // }
     // });
 
