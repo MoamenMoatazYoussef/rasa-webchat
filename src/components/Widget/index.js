@@ -177,7 +177,7 @@ class Widget extends Component {
 
   sendMessage(toSend) {
     let proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    // let proxyUrl = "";
+    proxyUrl = "";
     const sessionId = 500;
 
     let headers = new Headers();
@@ -199,13 +199,13 @@ class Widget extends Component {
         ,{ headers: headers }
       )
       .then(response => {
-        console.log("received:", response);
-        if (response.length == 0) {
+        console.log("received:", response.data);
+        if (response.data.length == 0) {
           return;
         }
 
-        if (this.socketId == response[0].recipient_id)
-          this.messages.push(response);
+        // if (this.socketId == response.data[0].recipient_id)
+          this.messages.push(response.data);
       })
       .catch(error => {
         console.log("Error during sending/receiving a message:", error);
