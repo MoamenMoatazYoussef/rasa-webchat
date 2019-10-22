@@ -8,6 +8,8 @@ import messages from "./reducers/messagesReducer";
 import { getLocalSession } from './reducers/helper';
 import * as actionTypes from './actions/actionTypes';
 
+import mySocket from "../mysocket";
+
 let store = "call initStore first";
 
 function initStore(hintText, connectingText, socket, storage, docViewer = false) {
@@ -15,7 +17,8 @@ function initStore(hintText, connectingText, socket, storage, docViewer = false)
     const session_id = (getLocalSession(storage, SESSION_NAME)? getLocalSession(storage, SESSION_NAME).session_id: null);
     switch (action.type) {
       case actionTypes.EMIT_NEW_USER_MESSAGE: {
-        socket.emit("message", action.text);
+        // socket.emit("message", action.text);
+        
       }
       case actionTypes.GET_OPEN_STATE: {
         return store.getState().behavior.get("isChatOpen");

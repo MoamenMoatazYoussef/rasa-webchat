@@ -5,9 +5,13 @@ import { Provider } from 'react-redux';
 import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
 import socket from './socket';
+import mySocket from "./mysocket";
+
+const MAX_TIMEOUT = 480000;
 
 const ConnectedWidget = (props) => {
-  const sock = socket(props.socketUrl, props.customData, props.socketPath);
+  // const sock = socket(props.socketUrl, props.customData, props.socketPath);
+  const sock = new mySocket(props.socketUrl, props.messageUrl, MAX_TIMEOUT);
   
   //TODO: Moamen modified this
   //const storage = props.params.storage == "session" ? sessionStorage : localStorage
@@ -41,7 +45,10 @@ const ConnectedWidget = (props) => {
       closeImage={props.closeImage}
       customComponent={props.customComponent}
 
-      contactsPath={props.contactsPath}
+      socketUrl={props.socketUrl}
+      socketPath={props.socketPath}
+      messageUrl={props.messageUrl}
+      listUrl={props.listUrl}
       refreshPeriod={props.refreshPeriod}
     />
   </Provider>);

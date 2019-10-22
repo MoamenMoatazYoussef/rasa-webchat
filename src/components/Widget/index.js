@@ -7,7 +7,6 @@ import {
   openChat,
   showChat,
   addUserMessage,
-  emitUserMessage,
   addResponseMessage,
   addLinkSnippet,
   addVideoSnippet,
@@ -15,19 +14,25 @@ import {
   addQuickReply,
   renderCustomComponent,
   initialize,
-  connectServer,
-  disconnectServer,
   pullSession
 } from "actions";
 
-import { isSnippet, isVideo, isImage, isQR, isText, isArrayOfTexts } from "./msgProcessor";
+import {
+  isSnippet,
+  isVideo,
+  isImage,
+  isQR,
+  isText,
+  isArrayOfTexts
+} from "./msgProcessor";
 import WidgetLayout from "./layout";
 
-import {
-  storeLocalSession,
-  getLocalSession
-} from "../../store/reducers/helper";
-import { SESSION_NAME, NEXT_MESSAGE } from "constants";
+import { getLocalSession } from "../../store/reducers/helper";
+import { SESSION_NAME } from "constants";
+
+import mySocket from "../../mysocket";
+import axios from "axios";
+const MAX_TIMEOUT = 480000;
 
 class Widget extends Component {
   constructor(props) {
@@ -38,97 +43,22 @@ class Widget extends Component {
         this.dispatchMessage(this.messages.shift());
       }
     }, this.props.interval);
+
+    console.log(this.props);
+
+    this.mySocket = this.props.socket;
+    //new mySocket(this.props.socketUrl, this.props.messageUrl, MAX_TIMEOUT);
+    this.messageUrl = this.props.messageUrl;
+    console.log(this.mySocket);
   }
 
   componentDidMount() {
-    const { socket, storage } = this.props;
-
-    socket.on("bot_uttered", botUttered => {
-      console.log("Printing after botUttered", botUttered[0] ,botUttered[0].recipient_id, this.socketId );
-
-      if(botUttered.length == 0) {
-        return;
-      }
-
-      if(this.socketId == botUttered[0].recipient_id)
-        this.messages.push(botUttered);
-    });
-
     this.props.dispatch(pullSession());
-
-    // Request a session from server
-    const local_id = this.getSessionId();
-
-    // TODO: Moamen Modified this
-    // socket.on("connect", () => {
-      // const dateInSeconds = new Date().getSeconds();
-      // const lastSessionId = JSON.parse(storage.getItem("last-session-id"));
-      // const lastSessionPeriod = JSON.parse(storage.getItem("last-session-period"));
-
-      // if(lastSessionId && lastSessionPeriod && Math.abs(dateInSeconds - lastSessionPeriod) < 5) {
-      //   storeLocalSession(storage, SESSION_NAME, lastSessionId);
-
-      //   const lastSession = JSON.parse(storage.getItem(SESSION_NAME));
-      //   const lastMessage = lastSession.conversation[lastSession.conversation.length - 1];
-
-      //   socket.emit("message", {
-      //     message: lastMessage.text,
-      //     customData: {},
-      //     session_id: lastSessionId ? lastSessionId : local_id 
-      //   });
-      // } else {
-        socket.emit("session_request", { session_id: local_id });
-      // }
-    // });
-
-    // When session_confirm is received from the server:
-    socket.on("session_confirm", remote_id => {
-      console.log(`session_confirm:${socket.id} session_id:${remote_id}`);
-      this.socketId = remote_id;
-
-      // Store the initial state to both the redux store and the storage, set connected to true
-      this.props.dispatch(connectServer());
-
-      /*
-      Check if the session_id is consistent with the server
-      If the local_id is null or different from the remote_id,
-      start a new session.
-      */
-      if (local_id !== remote_id) {
-        // storage.clear();
-        // Store the received session_id to storage
-
-        storeLocalSession(storage, SESSION_NAME, remote_id);
-        this.props.dispatch(pullSession());
-        this.trySendInitPayload();
-      } else {
-        // If this is an existing session, it's possible we changed pages and want to send a
-        // user message when we land.
-        const nextMessage = window.localStorage.getItem(NEXT_MESSAGE);
-
-        if (nextMessage !== null) {
-          const { message, expiry } = JSON.parse(nextMessage);
-          window.localStorage.removeItem(NEXT_MESSAGE);
-
-          if (expiry === 0 || expiry > Date.now()) {
-            this.props.dispatch(addUserMessage(message));
-            this.props.dispatch(emitUserMessage(message));
-          }
-        }
-      }
-    });
-
-    // TODO: Moamen Modified this
-    socket.on("disconnect", reason => {
-      console.log(reason);
-
-      // storage.setItem("last-session-id", JSON.stringify(this.getSessionId()));
-      // storage.setItem("last-session-period", new Date().getSeconds());
-
-      if (reason !== "io client disconnect") {
-        this.props.dispatch(disconnectServer());
-      }
-    });
+    try {
+      // this.mySocket.sessionRequest();
+    } catch (error) {
+      console.log(error);
+    }
 
     if (this.props.embedded && this.props.initialized) {
       this.props.dispatch(showChat());
@@ -145,16 +75,10 @@ class Widget extends Component {
     }
   }
 
-  componentWillUnmount() {
-    const { socket } = this.props;
-    socket.close();
-  }
+  componentWillUnmount() {}
 
   getSessionId() {
     const { storage } = this.props;
-    // Get the local session, check if there is an existing session_id
-
-
     const localSession = getLocalSession(storage, SESSION_NAME);
 
     console.log(localSession);
@@ -162,42 +86,11 @@ class Widget extends Component {
     return local_id;
   }
 
-  // TODO: Need to erase redux store on load if localStorage
-  // is erased. Then behavior on reload can be consistent with
-  // behavior on first load
-
   trySendInitPayload = () => {
-    const {
-      initPayload,
-      customData,
-      socket,
-      initialized,
-      isChatOpen,
-      isChatVisible,
-      embedded,
-      connected
-    } = this.props;
-
-    // Send initial payload when chat is opened or widget is shown
-    if (
-      !initialized &&
-      connected &&
-      ((isChatOpen && isChatVisible) || embedded)
-    ) {
-      // Only send initial payload if the widget is connected to the server but not yet initialized
-
-      const session_id = this.getSessionId();
-
-      // check that session_id is confirmed
-      if (!session_id) return;
-      console.log("sending init payload", session_id);
-      socket.emit("message", {
-        message: initPayload,
-        customData,
-        session_id: session_id
-      });
-      this.props.dispatch(initialize());
-    }
+    const { initPayload } = this.props;
+    console.log("sending init payload");
+    this.sendMessage(initPayload);
+    this.props.dispatch(initialize());
   };
 
   toggleConversation = () => {
@@ -205,21 +98,17 @@ class Widget extends Component {
   };
 
   dispatchMessage(message) {
-
-    // message = { text: message.text };
     console.log(message);
-    
+
     if (Object.keys(message).length === 0) {
       return;
     }
 
-    if(isArrayOfTexts(message)) {
+    if (isArrayOfTexts(message)) {
       message.forEach(element => {
         this.props.dispatch(addResponseMessage(element.text));
       });
-    } else
-
-    if (isText(message)) {
+    } else if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
       this.props.dispatch(addQuickReply(message));
@@ -250,8 +139,6 @@ class Widget extends Component {
         })
       );
     } else {
-      // some custom message
-
       const props = message;
       if (this.props.customComponent) {
         this.props.dispatch(
@@ -275,31 +162,47 @@ class Widget extends Component {
 
     let cleanMessage = this.removeTags(userUttered);
 
+    event.target.message.value = "";
+
     if (userUttered) {
       this.props.dispatch(addUserMessage(cleanMessage));
-      this.props.dispatch(emitUserMessage(userUtteredWithMails));
+      this.sendMessage(userUtteredWithMails);
     }
-    event.target.message.value = "";
   };
 
   //TODO: Moamen added this
-  replaceNamesWithMails(input) {
-    let result = input;
-    const { mailPositions } = this.state;
-
-    if (!mailPositions.length) {
-      return input;
-    }
-
-    for (let i = 0; i < mailPositions.length; i++) {
-      result = result.replace(mailPositions[i].name, mailPositions[i].mail);
-    }
-
-    return result;
-  }
-
   removeTags(input) {
     return input.replace(/@/g, "").replace(/\f/g, "");
+  }
+
+  sendMessage(toSend) {
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    // const proxyUrl = "";
+
+    const sessionId = 500;
+    axios
+      .post(proxyUrl + this.messageUrl, {
+        text: toSend,
+        sender_id: sessionId
+      })
+      .then(response => {
+        console.log("received:", response);
+        if (response.length == 0) {
+          return;
+        }
+
+        if (this.socketId == response[0].recipient_id)
+          this.messages.push(response);
+      })
+      .catch(error => {
+        console.log("Error during sending/receiving a message:", error);
+        this.messages.push([
+          {
+            text: "An error has occured, conversation restarted...",
+            sender_id: sessionId
+          }
+        ]);
+      });
   }
   //TODO: ENDOF Moamen added this
 
@@ -323,8 +226,7 @@ class Widget extends Component {
         openLauncherImage={this.props.openLauncherImage}
         closeImage={this.props.closeImage}
         customComponent={this.props.customComponent}
-
-        contactsPath={this.props.contactsPath}
+        listUrl={this.props.listUrl}
         refreshPeriod={this.props.refreshPeriod}
       />
     );

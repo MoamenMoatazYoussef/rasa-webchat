@@ -26,7 +26,7 @@ class AutocompleteInput extends Component {
 
       selected: 0,
 
-      contactsPath: props.contactsPath,
+      listUrl: props.listUrl,
       refreshPeriod: props.refreshPeriod
     };
 
@@ -394,7 +394,7 @@ class AutocompleteInput extends Component {
     let oldDate = Number(localStorage.getItem("date"));
     let oldContacts = localStorage.getItem("contacts");
 
-    const { contactsPath, refreshPeriod } = this.state;
+    const { listUrl, refreshPeriod } = this.state;
 
     if (oldContacts && date - oldDate < refreshPeriod) {
       console.log("loaded from cache");
@@ -408,13 +408,13 @@ class AutocompleteInput extends Component {
 
     console.log(
       "fetching data from ",
-      contactsPath,
+      listUrl,
       ", refresh period: ",
       refreshPeriod
     );
 
     axios
-      .post(contactsPath)
+      .post(listUrl)
       .then(
         response => {
           newContacts = response.data.json_list;

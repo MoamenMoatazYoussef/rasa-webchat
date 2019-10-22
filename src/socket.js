@@ -1,26 +1,30 @@
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
-export default function (socketUrl, customData, path) {
-  const defaultOptions = { timeout: 60000 };
-  const options = path ? { path, ...defaultOptions } : defaultOptions;
-  const socket = io(socketUrl, options);
+// const MAX_TIMEOUT = 480000;
 
-  socket.on('connect', () => {
-    console.log(`connect:${socket.id}`);
-    socket.customData = customData;
-  });
+// export default function (socketUrl, customData, path) {
+//   const defaultOptions = { timeout: MAX_TIMEOUT };
+//   const options = path ? { path, ...defaultOptions } : defaultOptions;
+//   const socket = io(socketUrl, options);
 
-  socket.on('connect_error', (error) => {
-    console.log(error);
-  });
+//   socket.requestTimeout = MAX_TIMEOUT;
 
-  socket.on('error', (error) => {
-    console.log(error);
-  });
+//   socket.on('connect', () => {
+//     console.log(`connect:${socket.id}`);
+//     socket.customData = customData;
+//   });
 
-  socket.on('disconnect', (reason) => {
-    console.log(reason);
-  });
+//   socket.on('connect_error', (error) => {
+//     console.log(error);
+//   });
 
-  return socket;
-};
+//   socket.on('error', (error) => {
+//     console.log(error);
+//   });
+
+//   socket.on('disconnect', (reason) => {
+//     console.log(reason);
+//   });
+
+//   return socket;
+// };

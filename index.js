@@ -8,6 +8,9 @@ const plugin = {
       <Widget
         socketUrl={args.socketUrl}
         socketPath={args.socketPath}
+        
+        messageUrl={args.messageUrl}
+
         interval={args.interval}
         initPayload={args.initPayload}
         title={args.title}
@@ -26,7 +29,7 @@ const plugin = {
         closeImage={args.closeImage}
         docViewer={args.docViewer}
 
-        contactsPath={args.contactsPath}
+        listUrl={args.listUrl}
         refreshPeriod={args.refreshPeriod}
 
       />, document.querySelector(args.selector)
@@ -40,15 +43,17 @@ plugin.init({
   interval: 1000,
   selector: "#webchat",
   initPayload: "/help",
-  socketUrl: "http://10.10.19.158:8080/",
-  // socketPath: "/socket.io/",
+  socketUrl: "http://10.10.19.158:5111/",
   title: "Moamen is Awesome",
   inputTextFieldHint: "Type a message...",
   connectingText: "Waiting for server...",
   hideWhenNotConnected: false, //TODO: Moamen added this
   docViewer: false,
-  contactsPath: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
+  listUrl: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
   refreshPeriod: 1,
+
+  messageUrl: "http://10.10.19.158:5111/CatchMsg",
+
   params: {
     images: {
       dims: {
