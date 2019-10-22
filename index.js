@@ -47,9 +47,9 @@ plugin.init({
   title: "Moamen is Awesome",
   inputTextFieldHint: "Type a message...",
   connectingText: "Waiting for server...",
-  hideWhenNotConnected: false, //TODO: Moamen added this
+  hideWhenNotConnected: false,
   docViewer: false,
-  listUrl: "http://10.10.19.158:5000/get_users_list", //"./src/resources/accounts.json",
+  listUrl: "http://10.10.19.158:5000/get_users_list",
   refreshPeriod: 1,
 
   messageUrl: "http://10.10.19.158:5111/CatchMsg",

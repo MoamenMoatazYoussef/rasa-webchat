@@ -176,15 +176,28 @@ class Widget extends Component {
   }
 
   sendMessage(toSend) {
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    // const proxyUrl = "";
-
+    let proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    // let proxyUrl = "";
     const sessionId = 500;
+
+    let headers = new Headers();
+
+    headers.append('X-Requested-With' , 'XMLHttpRequest');
+    
+
+    // headers.append("origin", "http://localhost:8080");
+
+    console.log(headers.get("X-Requested-With"));
+
     axios
-      .post(proxyUrl + this.messageUrl, {
-        text: toSend,
-        sender_id: sessionId
-      })
+      .post(
+        proxyUrl + this.messageUrl,
+        {
+          text: toSend,
+          session_id: sessionId
+        }
+        ,{ headers: headers }
+      )
       .then(response => {
         console.log("received:", response);
         if (response.length == 0) {
@@ -199,7 +212,7 @@ class Widget extends Component {
         this.messages.push([
           {
             text: "An error has occured, conversation restarted...",
-            sender_id: sessionId
+            session_id: sessionId
           }
         ]);
       });
