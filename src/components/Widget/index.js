@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import {
   toggleChat,
+  connectServer,
   openChat,
   showChat,
   addUserMessage,
@@ -44,16 +45,13 @@ class Widget extends Component {
       }
     }, this.props.interval);
 
-    console.log(this.props);
-
     this.mySocket = this.props.socket;
-    //new mySocket(this.props.socketUrl, this.props.messageUrl, MAX_TIMEOUT);
     this.messageUrl = this.props.messageUrl;
-    console.log(this.mySocket);
   }
 
   componentDidMount() {
     this.props.dispatch(pullSession());
+    this.props.dispatch(connectServer());
     try {
       // this.mySocket.sessionRequest();
     } catch (error) {
@@ -81,7 +79,6 @@ class Widget extends Component {
     const { storage } = this.props;
     const localSession = getLocalSession(storage, SESSION_NAME);
 
-    console.log(localSession);
     const local_id = localSession ? localSession.session_id : null;
     return local_id;
   }
@@ -98,8 +95,6 @@ class Widget extends Component {
   };
 
   dispatchMessage(message) {
-    console.log(message);
-
     if (Object.keys(message).length === 0) {
       return;
     }
@@ -181,13 +176,7 @@ class Widget extends Component {
     const sessionId = 500;
 
     let headers = new Headers();
-
     headers.append('X-Requested-With' , 'XMLHttpRequest');
-    
-
-    // headers.append("origin", "http://localhost:8080");
-
-    console.log(headers.get("X-Requested-With"));
 
     axios
       .post(
@@ -199,7 +188,6 @@ class Widget extends Component {
         ,{ headers: headers }
       )
       .then(response => {
-        console.log("received:", response.data);
         if (response.data.length == 0) {
           return;
         }
