@@ -62,11 +62,12 @@ class Widget extends Component {
       this.props.dispatch(showChat());
       this.props.dispatch(openChat());
     }
+    
+    this.trySendInitPayload();
   }
 
   componentDidUpdate() {
     this.props.dispatch(pullSession());
-    this.trySendInitPayload();
     if (this.props.embedded && this.props.initialized) {
       this.props.dispatch(showChat());
       this.props.dispatch(openChat());
@@ -173,7 +174,7 @@ class Widget extends Component {
   sendMessage(toSend) {
     let proxyUrl = "https://cors-anywhere.herokuapp.com/";
     proxyUrl = "";
-    const sessionId = 500;
+    const sessionId = 600;
 
     let headers = new Headers();
     headers.append('X-Requested-With' , 'XMLHttpRequest');
