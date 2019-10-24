@@ -47,6 +47,11 @@ class Widget extends Component {
 
     this.mySocket = this.props.socket;
     this.messageUrl = this.props.messageUrl;
+    this.socketUrl = "http://10.10.19.158:5111";
+
+    this.state = {
+      sessionId:null
+    }
   }
 
   componentDidMount() {
@@ -62,8 +67,21 @@ class Widget extends Component {
       this.props.dispatch(showChat());
       this.props.dispatch(openChat());
     }
+
+    const getTokenFunction = "/getToken";
+
+    axios.get(this.socketUrl + getTokenFunction)
+      .then(response => {
+        this.setState({
+          sessionId: response.data.session_id
+        });
+        this.trySendInitPayload();
+      })
+      .catch(error => {
+        console.log(error)
+      }
+    );
     
-    this.trySendInitPayload();
   }
 
   componentDidUpdate() {
@@ -172,16 +190,13 @@ class Widget extends Component {
   }
 
   sendMessage(toSend) {
-    let proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    proxyUrl = "";
-    const sessionId = 600;
+    const { sessionId } = this.state;
 
     let headers = new Headers();
     headers.append('X-Requested-With' , 'XMLHttpRequest');
 
     axios
-      .post(
-        proxyUrl + this.messageUrl,
+      .post(this.messageUrl,
         {
           text: toSend,
           session_id: sessionId
