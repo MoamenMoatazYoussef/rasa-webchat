@@ -126,10 +126,13 @@ class Widget extends Component {
     //   });
     // } else
     if (isText(message)) {
+      console.log("I'm a text message!");
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
+      console.log("I'm a QR message!");
       this.props.dispatch(addQuickReply(message));
     } else if (isSnippet(message)) {
+      console.log("I'm a Snippet message!");
       const element = message.attachment.payload.elements[0];
       this.props.dispatch(
         addLinkSnippet({
@@ -140,6 +143,7 @@ class Widget extends Component {
         })
       );
     } else if (isVideo(message)) {
+      console.log("I'm a video message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addVideoSnippet({
@@ -148,6 +152,7 @@ class Widget extends Component {
         })
       );
     } else if (isImage(message)) {
+      console.log("I'm a image message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addImageSnippet({
@@ -157,7 +162,11 @@ class Widget extends Component {
       );
     } else {
       const props = message;
+
+      console.log("I'm a custom message!", this.props.customComponent);
+
       if (this.props.customComponent) {
+        console.log("I'm inside the if condition!!!!!");
         this.props.dispatch(
           renderCustomComponent(this.props.customComponent, props, true)
         );

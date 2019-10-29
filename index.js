@@ -32,6 +32,8 @@ const plugin = {
         listUrl={args.listUrl}
         refreshPeriod={args.refreshPeriod}
 
+        customComponent={ (messageData) => (<div>Hiiiiiiiiii</div>) }
+
       />, document.querySelector(args.selector)
     );
   }
