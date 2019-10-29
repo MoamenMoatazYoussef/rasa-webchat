@@ -118,11 +118,12 @@ class Widget extends Component {
       return;
     }
 
-    if (isArrayOfTexts(message)) {
-      message.forEach(element => {
-        this.props.dispatch(addResponseMessage(element.text));
-      });
-    } else if (isText(message)) {
+    // if (isArrayOfTexts(message)) {
+    //   message.forEach(element => {
+    //     this.props.dispatch(addResponseMessage(element.text));
+    //   });
+    // } else
+     if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
       this.props.dispatch(addQuickReply(message));
@@ -153,6 +154,8 @@ class Widget extends Component {
         })
       );
     } else {
+
+      console.log("I'm a custommmm!");
       const props = message;
       if (this.props.customComponent) {
         this.props.dispatch(
@@ -160,6 +163,8 @@ class Widget extends Component {
         );
       }
     }
+
+    console.log("-------------------------------------------");
   }
 
   handleMessageSubmit = event => {
@@ -208,8 +213,14 @@ class Widget extends Component {
           return;
         }
 
-        // if (this.socketId == response.data[0].recipient_id)
-          this.messages.push(response.data);
+        // console.log(response.data.shift());
+
+        response.data.forEach(message => {
+          console.log("The message is:", message);
+          this.dispatchMessage(message);
+        })
+
+          // this.messages.push(response.data);
       })
       .catch(error => {
         console.log("Error during sending/receiving a message:", error);
