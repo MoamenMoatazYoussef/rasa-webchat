@@ -118,11 +118,14 @@ class Widget extends Component {
       return;
     }
 
-    if (isArrayOfTexts(message)) {
-      message.forEach(element => {
-        this.props.dispatch(addResponseMessage(element.text));
-      });
-    } else if (isText(message)) {
+    console.log("The message is: ", message);
+
+    // if (isArrayOfTexts(message)) {
+    //   message.forEach(element => {
+    //     this.props.dispatch(addResponseMessage(element.text));
+    //   });
+    // } else
+    if (isText(message)) {
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
       this.props.dispatch(addQuickReply(message));
@@ -208,8 +211,12 @@ class Widget extends Component {
           return;
         }
 
+        response.data.forEach(msg => {
+          this.dispatchMessage(msg);
+        });
+
         // if (this.socketId == response.data[0].recipient_id)
-          this.messages.push(response.data);
+          // this.messages.push(response.data);
       })
       .catch(error => {
         console.log("Error during sending/receiving a message:", error);
