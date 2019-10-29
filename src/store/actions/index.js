@@ -159,3 +159,9 @@ export function pullSession() {
   };
 }
 
+export function sendMessage(payload) {
+  return {
+    type: actions.SEND_MESSAGE,
+    payload
+  };
+}

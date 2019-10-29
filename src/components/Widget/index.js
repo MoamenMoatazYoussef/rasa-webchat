@@ -239,6 +239,12 @@ class Widget extends Component {
   }
   //TODO: ENDOF Moamen added this
 
+  componentDidUpdate() {
+    if(this.props.toSend) {
+      sendMessage(toSend);
+    }
+  }
+
   render() {
     return (
       <WidgetLayout
@@ -270,7 +276,8 @@ const mapStateToProps = state => ({
   initialized: state.behavior.get("initialized"),
   connected: state.behavior.get("connected"),
   isChatOpen: state.behavior.get("isChatOpen"),
-  isChatVisible: state.behavior.get("isChatVisible")
+  isChatVisible: state.behavior.get("isChatVisible"),
+  toSend: state.messages.get("toSend")
 });
 
 Widget.propTypes = {

@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 
+import {
+  sendMessage
+} from "actions";
+
 import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
 import socket from './socket';
@@ -43,13 +47,45 @@ const ConnectedWidget = (props) => {
       storage={storage}
       openLauncherImage={props.openLauncherImage}
       closeImage={props.closeImage}
-      customComponent={props.customComponent}
+      // customComponent={props.customComponent}
 
       socketUrl={props.socketUrl}
       socketPath={props.socketPath}
       messageUrl={props.messageUrl}
       listUrl={props.listUrl}
       refreshPeriod={props.refreshPeriod}
+
+      customComponent={ (messageData) => {
+          // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
+
+          const buttons = messageData.buttons;
+          const id = messageData.id;
+
+          return (
+          <div className="message">
+            <div className="response">
+              <div className="message-text">
+                <div className="markdown">
+                  <p>
+                    <span>
+                      {messageData.text}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                {buttons && buttons.map(btn => {
+                  console.log("The props are", props);
+                  return(
+                    <input id={id} type="button" value={btn.title} onclick={props.dispatch(sendMessage(btn.payload))}/>
+                  );
+                })}
+              </div>
+              </div>
+            </div>
+          ) 
+        }
+      }
     />
   </Provider>);
 };
