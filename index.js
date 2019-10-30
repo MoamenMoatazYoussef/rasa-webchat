@@ -32,6 +32,39 @@ const plugin = {
         listUrl={args.listUrl}
         refreshPeriod={args.refreshPeriod}
 
+        customComponent={ (messageData) => {
+          // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
+
+          const buttons = messageData.buttons;
+          const id = messageData.id;
+
+          console.log(buttons);
+
+          return (
+          <div className="message">
+            <div className="response">
+              <div className="message-text">
+                <div className="markdown">
+                  <p>
+                    <span>
+                      {messageData.text}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                {buttons && buttons.map(btn => {
+                  return(
+                    <input id={id} type="button" value={btn.title} onclick={this.sendMessage(btn.payload)}/>
+                  );
+                })}
+              </div>
+              </div>
+            </div>
+          ) 
+        }
+      }
+
       />, document.querySelector(args.selector)
     );
   }

@@ -23,17 +23,14 @@ import {
   isVideo,
   isImage,
   isQR,
-  isText,
-  isArrayOfTexts
+  isText
 } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
 import { getLocalSession } from "../../store/reducers/helper";
 import { SESSION_NAME } from "constants";
 
-import mySocket from "../../mysocket";
 import axios from "axios";
-const MAX_TIMEOUT = 480000;
 
 class Widget extends Component {
   constructor(props) {
@@ -118,16 +115,21 @@ class Widget extends Component {
       return;
     }
 
+    console.log("The message is: ", message);
+
     // if (isArrayOfTexts(message)) {
     //   message.forEach(element => {
     //     this.props.dispatch(addResponseMessage(element.text));
     //   });
     // } else
-     if (isText(message)) {
+    if (isText(message)) {
+      console.log("I'm a text message!");
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
+      console.log("I'm a QR message!");
       this.props.dispatch(addQuickReply(message));
     } else if (isSnippet(message)) {
+      console.log("I'm a Snippet message!");
       const element = message.attachment.payload.elements[0];
       this.props.dispatch(
         addLinkSnippet({
@@ -138,6 +140,7 @@ class Widget extends Component {
         })
       );
     } else if (isVideo(message)) {
+      console.log("I'm a video message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addVideoSnippet({
@@ -146,6 +149,7 @@ class Widget extends Component {
         })
       );
     } else if (isImage(message)) {
+      console.log("I'm a image message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addImageSnippet({
@@ -157,7 +161,11 @@ class Widget extends Component {
 
       console.log("I'm a custommmm!");
       const props = message;
+
+      console.log("I'm a custom message!", this.props.customComponent);
+
       if (this.props.customComponent) {
+        console.log("I'm inside the if condition!!!!!");
         this.props.dispatch(
           renderCustomComponent(this.props.customComponent, props, true)
         );
@@ -234,6 +242,12 @@ class Widget extends Component {
   }
   //TODO: ENDOF Moamen added this
 
+  componentDidUpdate() {
+    if(this.props.toSend) {
+      sendMessage(toSend);
+    }
+  }
+
   render() {
     return (
       <WidgetLayout
@@ -265,7 +279,8 @@ const mapStateToProps = state => ({
   initialized: state.behavior.get("initialized"),
   connected: state.behavior.get("connected"),
   isChatOpen: state.behavior.get("isChatOpen"),
-  isChatVisible: state.behavior.get("isChatVisible")
+  isChatVisible: state.behavior.get("isChatVisible"),
+  toSend: state.messages.get("toSend")
 });
 
 Widget.propTypes = {
