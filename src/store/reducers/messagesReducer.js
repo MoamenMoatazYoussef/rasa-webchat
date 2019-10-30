@@ -53,7 +53,7 @@ export default function (storage) {
         return storeMessage(initialState)
       }
       case actionTypes.SEND_MESSAGE: {
-        return storeMessage(state.set('toSend', action.payload));
+        return storeMessage(state.setIn([action.id, 'toSend'], action.payload));
       }
       // Pull conversation from storage, parsing as immutable List
       case actionTypes.PULL_SESSION: {

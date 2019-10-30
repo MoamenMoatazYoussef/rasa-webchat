@@ -15,7 +15,8 @@ import {
   addQuickReply,
   renderCustomComponent,
   initialize,
-  pullSession
+  pullSession,
+  sendMessage
 } from "actions";
 
 import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
@@ -25,6 +26,7 @@ import { getLocalSession } from "../../store/reducers/helper";
 import { SESSION_NAME } from "constants";
 
 import axios from "axios";
+import { store } from "../../store/store";
 
 class Widget extends Component {
   constructor(props) {
@@ -43,6 +45,12 @@ class Widget extends Component {
     this.state = {
       sessionId: null
     };
+    console.log("Store:", this.props.toSend);
+    store.subscribe((msg) => {
+      // this.props.dispatch(addUserMessage(msg));
+      // this.sendMessage(msg);
+    });
+
   }
 
   componentDidMount() {
@@ -94,7 +102,7 @@ class Widget extends Component {
 
   trySendInitPayload = () => {
     const { initPayload } = this.props;
-    console.log("sending init payload");
+    // console.log("sending init payload");
     this.sendMessage(initPayload);
     this.props.dispatch(initialize());
   };
@@ -116,13 +124,13 @@ class Widget extends Component {
     //   });
     // } else
     if (isText(message)) {
-      console.log("I'm a text message!");
+      // console.log("I'm a text message!");
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
-      console.log("I'm a QR message!");
+      // console.log("I'm a QR message!");
       this.props.dispatch(addQuickReply(message));
     } else if (isSnippet(message)) {
-      console.log("I'm a Snippet message!");
+      // console.log("I'm a Snippet message!");
       const element = message.attachment.payload.elements[0];
       this.props.dispatch(
         addLinkSnippet({
@@ -133,7 +141,7 @@ class Widget extends Component {
         })
       );
     } else if (isVideo(message)) {
-      console.log("I'm a video message!");
+      // console.log("I'm a video message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addVideoSnippet({
@@ -142,7 +150,7 @@ class Widget extends Component {
         })
       );
     } else if (isImage(message)) {
-      console.log("I'm a image message!");
+      // console.log("I'm a image message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addImageSnippet({
@@ -151,15 +159,18 @@ class Widget extends Component {
         })
       );
     } else {
-      console.log("I'm a custommmm!");
+      // console.log("I'm a custommmm!");
       const props = message;
 
-      console.log("I'm a custom message!", this.props.customComponent);
+      // console.log("I'm a custom message!", this.props.customComponent);
 
       if (this.props.customComponent) {
-        console.log("I'm inside the if condition!!!!!");
+        // console.log("I'm inside the if condition!!!!!");
         this.props.dispatch(
-          renderCustomComponent(this.props.customComponent, props, true)
+          renderCustomComponent(
+            this.props.customComponent(message, (message) => this.props.dispatch(sendMessage(message)))
+            , props, true
+            )
         );
       }
     }
@@ -195,6 +206,10 @@ class Widget extends Component {
   }
 
   sendMessage(toSend) {
+    console.log("Sending:", toSend);
+    if(!toSend) {
+      return;
+    }
     const { sessionId } = this.state;
 
     let headers = new Headers();
@@ -218,7 +233,7 @@ class Widget extends Component {
 
         setTimeout(() => {
           response.data.forEach(message => {
-            console.log("The message is:", message);
+            // console.log("The message is:", message);
             this.dispatchMessage(message);
           });
         }, this.props.interval);
@@ -276,6 +291,11 @@ const mapStateToProps = state => ({
   isChatOpen: state.behavior.get("isChatOpen"),
   isChatVisible: state.behavior.get("isChatVisible"),
   toSend: state.messages.get("toSend")
+
+});
+
+const mapDispatchToProps = dispatch => ({
+  sendNewMessage: msg => dispatch(sendMessage(msg))
 });
 
 Widget.propTypes = {
@@ -306,4 +326,4 @@ Widget.defaultProps = {
   isChatVisible: true
 };
 
-export default connect(mapStateToProps)(Widget);
+export default connect(mapStateToProps, mapDispatchToProps)(Widget);

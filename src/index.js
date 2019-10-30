@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Provider } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 
-import {
-  sendMessage
-} from "actions";
+import { sendMessage } from "actions";
 
 import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
-import socket from './socket';
 import mySocket from "./mysocket";
 
 const MAX_TIMEOUT = 480000;
@@ -56,38 +53,42 @@ const ConnectedWidget = (props) => {
       refreshPeriod={props.refreshPeriod}
       
       customComponent={props.customComponent}
-      // customComponent=
-      // { (messageData) => {
-      //     // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
-
-      //     const buttons = messageData.buttons;
-      //     const id = messageData.id;
-
-      //     return (
-      //     <div className="message">
-      //       <div className="response">
-      //         <div className="message-text">
-      //           <div className="markdown">
-      //             <p>
-      //               <span>
-      //                 {messageData.text}
-      //               </span>
-      //             </p>
-      //           </div>
-      //         </div>
-      //         <div>
-      //           {buttons && buttons.map(btn => {
-      //             console.log("The props are", props);
-      //             return(
-      //               <input id={id} type="button" value={btn.title} onclick={props.dispatch(sendMessage(btn.payload))}/>
-      //             );
-      //           })}
-      //         </div>
-      //         </div>
-      //       </div>
-      //     ) 
-      //   }
-      // }
+      customComponent={ 
+        (messageData) => {
+        // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
+        const buttons = messageData.buttons;
+        const onClick = (msg) => {
+          console.log("The button says:", msg);
+          store.dispatch(sendMessage(msg))
+        };
+        // console.log(onClick);
+    
+        return (
+        <div className="message">
+          <div className="response">
+            <div className="message-text">
+              <div className="markdown">
+                    {messageData.text}
+              </div>
+            </div>
+            <div>
+              {
+                buttons && buttons.map(btn => {
+                return(
+                  <input 
+                    // key={} 
+                    type="button" 
+                    value={btn.title} 
+                    onClick={() => onClick(btn.payload)}
+                  />
+                );
+              })}
+            </div>
+            </div>
+          </div>
+        ) 
+      }
+    }
     />
   </Provider>);
 };
@@ -132,5 +133,11 @@ ConnectedWidget.defaultProps = {
   },
   docViewer: false
 };
+
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     onClick: msg => dispatch(sendMessage(msg))
+//   }
+// }
 
 export default ConnectedWidget;

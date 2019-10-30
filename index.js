@@ -1,6 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Widget, toggleChat, openChat, closeChat, showChat, hideChat, isOpen, isVisible } from './index_for_react_app';
+import {
+  sendMessage
+} from "actions";
+import {
+  dispatch
+} from "react-redux";
 
 const plugin = {
   init: (args) => {
@@ -55,38 +61,6 @@ plugin.init({
   refreshPeriod: 1,
 
   messageUrl: "http://10.10.19.158:5111/CatchMsg",
-
-  customComponent: (messageData) => {
-    // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
-    const buttons = messageData.buttons;
-    const id = messageData.id;
-
-    console.log(buttons);
-
-    return (
-    <div className="message">
-      <div className="response">
-        <div className="message-text">
-          <div className="markdown">
-                {messageData.text}
-          </div>
-        </div>
-        <div>
-          {buttons && buttons.map(btn => {
-            return(
-              <input 
-                id={id} 
-                type="button" 
-                value={btn.title} 
-                // onclick={this.sendMessage(btn.payload)}
-              />
-            );
-          })}
-        </div>
-        </div>
-      </div>
-    ) 
-  },
 
   params: {
     images: {
