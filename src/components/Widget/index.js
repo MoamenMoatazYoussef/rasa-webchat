@@ -18,13 +18,7 @@ import {
   pullSession
 } from "actions";
 
-import {
-  isSnippet,
-  isVideo,
-  isImage,
-  isQR,
-  isText
-} from "./msgProcessor";
+import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
 import { getLocalSession } from "../../store/reducers/helper";
@@ -47,8 +41,8 @@ class Widget extends Component {
     this.socketUrl = "http://10.10.19.158:5111";
 
     this.state = {
-      sessionId:null
-    }
+      sessionId: null
+    };
   }
 
   componentDidMount() {
@@ -67,7 +61,8 @@ class Widget extends Component {
 
     const getTokenFunction = "/getToken";
 
-    axios.get(this.socketUrl + getTokenFunction)
+    axios
+      .get(this.socketUrl + getTokenFunction)
       .then(response => {
         this.setState({
           sessionId: response.data.session_id
@@ -75,10 +70,8 @@ class Widget extends Component {
         this.trySendInitPayload();
       })
       .catch(error => {
-        console.log(error)
-      }
-    );
-    
+        console.log(error);
+      });
   }
 
   componentDidUpdate() {
@@ -158,7 +151,6 @@ class Widget extends Component {
         })
       );
     } else {
-
       console.log("I'm a custommmm!");
       const props = message;
 
@@ -206,15 +198,16 @@ class Widget extends Component {
     const { sessionId } = this.state;
 
     let headers = new Headers();
-    headers.append('X-Requested-With' , 'XMLHttpRequest');
+    headers.append("X-Requested-With", "XMLHttpRequest");
 
     axios
-      .post(this.messageUrl,
+      .post(
+        this.messageUrl,
         {
           text: toSend,
           session_id: sessionId
-        }
-        ,{ headers: headers }
+        },
+        { headers: headers }
       )
       .then(response => {
         if (response.data.length == 0) {
@@ -223,12 +216,14 @@ class Widget extends Component {
 
         // console.log(response.data.shift());
 
-        response.data.forEach(message => {
-          console.log("The message is:", message);
-          this.dispatchMessage(message);
-        })
+        setTimeout(() => {
+          response.data.forEach(message => {
+            console.log("The message is:", message);
+            this.dispatchMessage(message);
+          });
+        }, this.props.interval);
 
-          // this.messages.push(response.data);
+        // this.messages.push(response.data);
       })
       .catch(error => {
         console.log("Error during sending/receiving a message:", error);
@@ -243,7 +238,7 @@ class Widget extends Component {
   //TODO: ENDOF Moamen added this
 
   componentDidUpdate() {
-    if(this.props.toSend) {
+    if (this.props.toSend) {
       sendMessage(toSend);
     }
   }

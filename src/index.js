@@ -47,45 +47,47 @@ const ConnectedWidget = (props) => {
       storage={storage}
       openLauncherImage={props.openLauncherImage}
       closeImage={props.closeImage}
-      // customComponent={props.customComponent}
+
 
       socketUrl={props.socketUrl}
       socketPath={props.socketPath}
       messageUrl={props.messageUrl}
       listUrl={props.listUrl}
       refreshPeriod={props.refreshPeriod}
+      
+      customComponent={props.customComponent}
+      // customComponent=
+      // { (messageData) => {
+      //     // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
 
-      customComponent={ (messageData) => {
-          // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
+      //     const buttons = messageData.buttons;
+      //     const id = messageData.id;
 
-          const buttons = messageData.buttons;
-          const id = messageData.id;
-
-          return (
-          <div className="message">
-            <div className="response">
-              <div className="message-text">
-                <div className="markdown">
-                  <p>
-                    <span>
-                      {messageData.text}
-                    </span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                {buttons && buttons.map(btn => {
-                  console.log("The props are", props);
-                  return(
-                    <input id={id} type="button" value={btn.title} onclick={props.dispatch(sendMessage(btn.payload))}/>
-                  );
-                })}
-              </div>
-              </div>
-            </div>
-          ) 
-        }
-      }
+      //     return (
+      //     <div className="message">
+      //       <div className="response">
+      //         <div className="message-text">
+      //           <div className="markdown">
+      //             <p>
+      //               <span>
+      //                 {messageData.text}
+      //               </span>
+      //             </p>
+      //           </div>
+      //         </div>
+      //         <div>
+      //           {buttons && buttons.map(btn => {
+      //             console.log("The props are", props);
+      //             return(
+      //               <input id={id} type="button" value={btn.title} onclick={props.dispatch(sendMessage(btn.payload))}/>
+      //             );
+      //           })}
+      //         </div>
+      //         </div>
+      //       </div>
+      //     ) 
+      //   }
+      // }
     />
   </Provider>);
 };
