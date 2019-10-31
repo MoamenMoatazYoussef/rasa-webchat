@@ -45,20 +45,12 @@ class Widget extends Component {
     this.state = {
       sessionId: null
     };
-    
-   //  store.subscribe(() => {
-   //    console.log("About to send: ", this.props.toSend);
-   //    // console.log("Store toSend argument: ", this.props.toSend);
-   //   this.sendMessage(this.props.toSend)
-   // });
-
   }
 
   componentDidMount() {
     this.props.dispatch(pullSession());
     this.props.dispatch(connectServer());
     try {
-      // this.mySocket.sessionRequest();
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +95,6 @@ class Widget extends Component {
 
   trySendInitPayload = () => {
     const { initPayload } = this.props;
-    // console.log("sending init payload");
     this.sendMessage(initPayload);
     this.props.dispatch(initialize());
   };
@@ -117,21 +108,11 @@ class Widget extends Component {
       return;
     }
 
-    console.log("The message is: ", message);
-
-    // if (isArrayOfTexts(message)) {
-    //   message.forEach(element => {
-    //     this.props.dispatch(addResponseMessage(element.text));
-    //   });
-    // } else
     if (isText(message)) {
-      // console.log("I'm a text message!");
       this.props.dispatch(addResponseMessage(message.text));
     } else if (isQR(message)) {
-      // console.log("I'm a QR message!");
       this.props.dispatch(addQuickReply(message));
     } else if (isSnippet(message)) {
-      // console.log("I'm a Snippet message!");
       const element = message.attachment.payload.elements[0];
       this.props.dispatch(
         addLinkSnippet({
@@ -142,7 +123,6 @@ class Widget extends Component {
         })
       );
     } else if (isVideo(message)) {
-      // console.log("I'm a video message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addVideoSnippet({
@@ -151,7 +131,6 @@ class Widget extends Component {
         })
       );
     } else if (isImage(message)) {
-      // console.log("I'm a image message!");
       const element = message.attachment.payload;
       this.props.dispatch(
         addImageSnippet({
@@ -160,13 +139,9 @@ class Widget extends Component {
         })
       );
     } else {
-      // console.log("I'm a custommmm!");
       const props = message;
 
-      // console.log("I'm a custom message!", this.props.customComponent);
-
       if (this.props.customComponent) {
-        // console.log("I'm inside the if condition!!!!!");
         this.props.dispatch(
           renderCustomComponent(
             this.props.customComponent(message, (message) => this.props.dispatch(sendMessage(message)))
@@ -230,16 +205,11 @@ class Widget extends Component {
           return;
         }
 
-        // console.log(response.data.shift());
-
         setTimeout(() => {
           response.data.forEach(message => {
-            // console.log("The message is:", message);
             this.dispatchMessage(message);
           });
         }, this.props.interval);
-
-        // this.messages.push(response.data);
       })
       .catch(error => {
         console.log("Error during sending/receiving a message:", error);

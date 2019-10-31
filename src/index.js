@@ -8,6 +8,9 @@ import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
 import mySocket from "./mysocket";
 
+import "./styles.scss";
+import ReactMarkdown from 'react-markdown';
+
 const MAX_TIMEOUT = 480000;
 
 const ConnectedWidget = (props) => {
@@ -55,35 +58,44 @@ const ConnectedWidget = (props) => {
       customComponent={props.customComponent}
       customComponent={ 
         (messageData) => {
-        // found: object with keys {id, buttons, recipient_id, text, isLast, store, dispatch}
+
         const buttons = messageData.buttons;
+        
         const onClick = (msg) => {
           console.log("The button says:", msg);
           store.dispatch(sendMessage(msg))
         };
-        // console.log(onClick);
+
+        // const componentToRender = ((sender) => {
+        //   const msg = createNewMessage(messageData.text);
+        //   console.log("My message:", msg);
+
+        //  return(<Message
+        //     message={createNewMessage(messageData.text, sender)}
+        //   />)})(MESSAGE_SENDER.RESPONSE);
     
         return (
-        <div className="message">
-          <div className="response">
+          <div className={'response'}>
             <div className="message-text">
-              <div className="markdown">
-                    {messageData.text}
+              <ReactMarkdown
+                className={'markdown'}
+                source={messageData.text}
+                transformLinkUri={null}
+              />
+    
+              <div>
+                {
+                  buttons && buttons.map(btn => {
+                    return(
+                      <input 
+                        type="button" 
+                        value={btn.title} 
+                        onClick={() => onClick(btn.payload)}
+                      />
+                    );
+                  })
+                }
               </div>
-            </div>
-            <div>
-              {
-                buttons && buttons.map(btn => {
-                return(
-                  <input 
-                    // key={} 
-                    type="button" 
-                    value={btn.title} 
-                    onClick={() => onClick(btn.payload)}
-                  />
-                );
-              })}
-            </div>
             </div>
           </div>
         ) 
