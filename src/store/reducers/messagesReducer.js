@@ -53,7 +53,11 @@ export default function (storage) {
         return storeMessage(initialState)
       }
       case actionTypes.SEND_MESSAGE: {
-        return storeMessage(state.setIn([action.id, 'toSend'], action.payload));
+        console.log("The action is: ", action);
+        const toReturn = storeMessage(state.push(createNewMessage(action.payload, MESSAGE_SENDER.CLIENT)))
+        console.log(state);
+
+        return toReturn;
       }
       // Pull conversation from storage, parsing as immutable List
       case actionTypes.PULL_SESSION: {

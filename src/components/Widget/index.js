@@ -47,9 +47,10 @@ class Widget extends Component {
     };
     console.log("Store:", this.props.toSend);
     store.subscribe((msg) => {
-      // this.props.dispatch(addUserMessage(msg));
-      // this.sendMessage(msg);
-    });
+      console.log("About to send: ", msg);
+      console.log("Store toSend argument: ", this.props.toSend);
+     this.sendMessage(msg)
+   });
 
   }
 
@@ -294,9 +295,9 @@ const mapStateToProps = state => ({
 
 });
 
-const mapDispatchToProps = dispatch => ({
-  sendNewMessage: msg => dispatch(sendMessage(msg))
-});
+// const mapDispatchToProps = dispatch => ({
+//   sendNewMessage: msg => dispatch(sendMessage(msg))
+// });
 
 Widget.propTypes = {
   interval: PropTypes.number,
@@ -326,4 +327,4 @@ Widget.defaultProps = {
   isChatVisible: true
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Widget);
+export default connect(mapStateToProps, null)(Widget);
