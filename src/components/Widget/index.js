@@ -45,12 +45,12 @@ class Widget extends Component {
     this.state = {
       sessionId: null
     };
-    console.log("Store:", this.props.toSend);
-    store.subscribe((msg) => {
-      console.log("About to send: ", msg);
-      console.log("Store toSend argument: ", this.props.toSend);
-     this.sendMessage(msg)
-   });
+    
+   //  store.subscribe(() => {
+   //    console.log("About to send: ", this.props.toSend);
+   //    // console.log("Store toSend argument: ", this.props.toSend);
+   //   this.sendMessage(this.props.toSend)
+   // });
 
   }
 
@@ -254,8 +254,10 @@ class Widget extends Component {
   //TODO: ENDOF Moamen added this
 
   componentDidUpdate() {
-    if (this.props.toSend) {
-      sendMessage(toSend);
+    const toSend = this.props.toSend;
+    console.log("About to send:", toSend);
+    if (toSend) {
+      this.sendMessage(toSend);
     }
   }
 
@@ -291,7 +293,7 @@ const mapStateToProps = state => ({
   connected: state.behavior.get("connected"),
   isChatOpen: state.behavior.get("isChatOpen"),
   isChatVisible: state.behavior.get("isChatVisible"),
-  toSend: state.messages.get("toSend")
+  toSend: state.behavior.get("toSend")
 
 });
 

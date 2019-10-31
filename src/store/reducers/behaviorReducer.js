@@ -63,6 +63,14 @@ export default function (inputFieldTextHint, connectingText, storage, docViewer 
           return state;
         }
       }
+      case actionTypes.SEND_MESSAGE: {
+        let toMerge = new Map([["toSend", action.payload]]);
+        let newState = new Map([...state, ...toMerge]);
+        console.log(newState);
+        console.log(newState.get("toSend"));
+
+        return newState;
+      }
       default:
         return state;
     }
