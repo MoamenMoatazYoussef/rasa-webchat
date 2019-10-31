@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect, Provider } from 'react-redux';
 
-import { sendMessage } from "actions";
+import { sendMessage, addUserMessage } from "actions";
 
 import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
@@ -64,15 +64,8 @@ const ConnectedWidget = (props) => {
         const onClick = (msg) => {
           console.log("The button says:", msg);
           store.dispatch(sendMessage(msg))
+          store.dispatch(addUserMessage(msg))
         };
-
-        // const componentToRender = ((sender) => {
-        //   const msg = createNewMessage(messageData.text);
-        //   console.log("My message:", msg);
-
-        //  return(<Message
-        //     message={createNewMessage(messageData.text, sender)}
-        //   />)})(MESSAGE_SENDER.RESPONSE);
     
         return (
           <div className={'response'}>
@@ -88,6 +81,7 @@ const ConnectedWidget = (props) => {
                   buttons && buttons.map(btn => {
                     return(
                       <input 
+                        className="my-button"
                         type="button" 
                         value={btn.title} 
                         onClick={() => onClick(btn.payload)}
