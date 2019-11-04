@@ -60,12 +60,8 @@ plugin.init({
   listUrl: "http://10.10.19.158:5000/get_users_list",
   refreshPeriod: 1,
 
-<<<<<<< Updated upstream
-//   messageUrl: "http://10.10.19.158:5111/CatchMsg",
-=======
   messageUrl: "http://10.10.19.158:5111/CatchMsg",
   showCustomComponentMessage: false,
->>>>>>> Stashed changes
 
   params: {
     images: {
