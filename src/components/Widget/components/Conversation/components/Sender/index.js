@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
-import AutocompleteInput from "./AutocompleteInput";
+import AutocompleteInput from "./components/AutocompleteInput";
 
 import send from "assets/send_button.svg";
 import "./style.scss";
@@ -10,13 +10,7 @@ import "./style.scss";
 const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, listUrl, refreshPeriod }) => (
   <form className="sender" onSubmit={sendMessage}>
     <AutocompleteInput
-      inputFieldTextHint={inputFieldTextHint}
-      // disabledInput={disabledInput}
       autoFocus
-      autoComplete="off"
-
-      listUrl={listUrl}
-      refreshPeriod={refreshPeriod}
     />
     <button type="submit" className="send">
       <img src={send} className="send-icon" alt="send" />

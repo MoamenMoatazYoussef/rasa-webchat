@@ -26,6 +26,7 @@ import { getLocalSession } from "../../store/reducers/helper";
 import { SESSION_NAME } from "constants";
 
 import axios from "axios";
+import Proxy from "../Proxy";
 import { store } from "../../store/store";
 
 class Widget extends Component {
@@ -45,6 +46,23 @@ class Widget extends Component {
     this.state = {
       sessionId: null
     };
+
+    this.proxy = new Proxy(props);
+
+    this.stateEventsHandler = this.stateEventsHandler.bind(this);
+    // this.sendMessage = this.sendMessage.bind(this);
+
+  }
+
+  stateEventsHandler() {
+    console.log("Inside the stateEventsHandler");
+    // if(!this.props) return;
+    // const toSend = this.props.toSend;
+    // if (toSend) {
+    //   console.log("About to send:", toSend);
+    //   // debugger;
+    //   this.sendMessage(toSend);
+    // }
   }
 
   componentDidMount() {
@@ -73,6 +91,15 @@ class Widget extends Component {
       .catch(error => {
         console.log(error);
       });
+
+
+    // store.subscribe(this.stateEventsHandler);
+
+    this.proxy.getAutocompleteProxy().fetchElements(
+      this.props.callDestination, this.props.refreshPeriod
+    );
+
+    
   }
 
   componentDidUpdate() {

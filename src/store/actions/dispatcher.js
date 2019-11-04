@@ -101,3 +101,35 @@ export function pullSession() {
 export function sendMessage(payload) {
   store.dispatch(actions.sendMessage(payload));
 }
+
+export function setAutocompleteList(dataList) {
+  store.dispatch(actions.setAutocompleteList(dataList));
+}
+
+export function setAutocompleteCallDestination(destination) {
+  store.dispatch(actions.setAutocompleteCallDestination(destination));
+}
+
+export function setAutocompleteElementsToReplace(elements) {
+  store.dispatch(actions.setAutocompleteElementsToReplace(elements));
+}
+
+export function setAutocompleteState(autocompleteState) {
+  store.dispatch(actions.setAutocompleteState(autocompleteState));
+}
+
+export function setAutocompleteCurrentInput(input) {
+  store.dispatch(actions.setAutocompleteCurrentInput(input));
+}
+
+export function setAutocompleteSelected(selected) {
+  store.dispatch(actions.setAutocompleteSelected(selected));
+}
+
+export function setAutocompletePositions(positions) {
+  store.dispatch(actions.setAutocompletePositions(positions));
+}
+
+export function setAutocompleteAlteredInput(alteredInput) {
+  store.dispatch(actions.setAutocompleteAlteredInput(alteredInput));
+}

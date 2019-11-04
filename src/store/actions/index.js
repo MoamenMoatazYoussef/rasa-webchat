@@ -165,3 +165,59 @@ export function sendMessage(payload) {
     payload
   };
 }
+
+export function setAutocompleteList(dataList) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_LIST,
+    dataList
+  };
+}
+
+export function setAutocompleteCallDestination(destination) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_CALL_DESTINATION,
+    destination
+  };
+}
+
+export function setAutocompleteElementsToReplace(elements) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_ELEMENTS_TO_REPLACE,
+    elements
+  };
+}
+
+export function setAutocompleteState(autocompleteState) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_STATE,
+    autocompleteState
+  };
+}
+
+export function setAutocompleteCurrentInput(input) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_CURRENT_INPUT,
+    input
+  }
+}
+
+export function setAutocompleteSelected(selected) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_SELECTED,
+    selected
+  }
+}
+
+export function setAutocompletePositions(positions) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_POSITIONS,
+    positions
+  }
+}
+
+export function setAutocompleteAlteredInput(alteredInput) {
+  return {
+    type: actions.SET_AUTOCOMPLETE_ALTERED_INPUT,
+    alteredInput
+  }
+}

@@ -1,44 +1,34 @@
 import React, { Component } from "react";
 import { Manager, Reference, Popper } from "react-popper";
-import axios from "axios";
 
-import "../style.scss";
+import "../../style.scss";
 import "./style.scss";
 
-const KEY_DOWN = 40;
-const KEY_UP = 38;
-const KEY_ENTER = 13;
-const KEY_DELETE = 8;
+import {
+  setAutocompleteState,
+  setAutocompleteCurrentInput,
+  setAutocompleteSelected,
+  setAutocompletePositions
+} from "actions";
+
+import { replace } from "../helper";
+
+import { KEY_DELETE, KEY_ENTER, KEY_UP, KEY_DOWN } from '../../../../../../../../constants';
 
 class AutocompleteInput extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      currentInput: "",
-      mailPositions: [],
-      dataList: [],
-
-      autocompleteList: [],
-      autocompleteStart: 0,
-      autocompleteEnd: 0,
-      autocompleteState: false,
-
-      selected: 0,
-
-      listUrl: props.listUrl,
-      refreshPeriod: props.refreshPeriod
+      filteredList: []
     };
 
+    this.selectedStrings = [];
     this.startTag = "@";
-    this.endTag = "\f"; //"$";
+    this.endTag = "\f";
+    this.autocompleteStart = 0;
+    this.autocompleteEnd = 0;
 
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-    this.onClick = this.onClick.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-
-    this.setCurrentInput = this.setCurrentInput.bind(this);
     this.performNavigation = this.performNavigation.bind(this);
     this.performAutocomplete = this.performAutocomplete.bind(this);
     this.checkAutocomplete = this.checkAutocomplete.bind(this);
@@ -46,10 +36,15 @@ class AutocompleteInput extends Component {
     this.getFromLastWord = this.getFromLastWord.bind(this);
     this.getAutocompleteEnd = this.getAutocompleteEnd.bind(this);
     this.matchWithArray = this.matchWithArray.bind(this);
-    this.replaceNamesWithMails = this.replaceNamesWithMails.bind(this);
 
-    this.fetchContacts = this.fetchContacts.bind(this);
   }
+
+    /* <<<<<<<<<<<<<<<<<<<< Redux wrapper functions >>>>>>>>>>>>>>>>>>>> */
+
+    setCurrentInput = input => this.props.setCurrentInput(input);
+    setAutocompleteState = autocompleteState => this.props.setAutocompleteState(autocompleteState);
+    setAutocompleteSelected = selected => this.props.setAutocompleteSelected(selected);
+    setAutocompletePositions = positions => this.props.setAutocompletePositions(positions);
 
   /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
 
@@ -58,30 +53,33 @@ class AutocompleteInput extends Component {
       const cursorPosition = event.target.selectionEnd;
       event.target.value = this.onDelete(event);
       event.target.selectionEnd = cursorPosition;
-      this.setCurrentInput(event);
+      this.setCurrentInput(event.target.value);
       return;
     }
 
-    const { autocompleteState } = this.state;
+    const { autocompleteState } = this.props;
 
     const i = event.target.selectionStart - 1;
-    const newAutocompleteState = event.target.value[i] === "@";
+    const newAutocompleteState = this.checkAutocomplete(event.target.value);
+     // (event.target.value.includes("@") && event.target.value[i] === "@");
 
     if (autocompleteState || newAutocompleteState) {
       this.performNavigation(event);
     } else {
       if (event.keyCode === KEY_ENTER) {
-        event.target.mailInput = this.replaceNamesWithMails(event);
+        event.target.mailInput = replace(event.target.input, this.selectedStrings);
         return;
       }
     }
   }
 
   onKeyUp(event) {
-    const { currentInput, autocompleteState } = this.state;
+    const { currentInput, autocompleteState } = this.props;
 
     const i = event.target.selectionStart - 1;
-    const newAutocompleteState = event.target.value[i] === "@";
+    const newAutocompleteState = this.checkAutocomplete(event.target.value);
+    // (event.target.value.includes("@") && event.target.value[i] === "@");
+
     const changed = event.target.value !== currentInput;
 
     if (changed && (autocompleteState || newAutocompleteState)) {
@@ -90,14 +88,15 @@ class AutocompleteInput extends Component {
       if (event.keyCode === KEY_ENTER) {
         this.onSubmit(event);
       } else {
-        this.setCurrentInput(event);
+        this.setCurrentInput(event.target.value);
       }
     }
   }
 
   onClick(i, cursorPosition, event) {
-    const { autocompleteList, currentInput, mailPositions } = this.state;
-    const selectedOption = autocompleteList[i];
+    const { filteredList } = this.state;
+    const { currentInput } = this.props;
+    const selectedOption = filteredList[i];
 
     const autocompleteStart = this.getAutocompleteStart(
       currentInput,
@@ -124,25 +123,29 @@ class AutocompleteInput extends Component {
       this.endTag
     ).length;
 
+    this.setCurrentInput(newInput);
+    this.setAutocompleteState(false);
+
+    this.selectedStrings = [
+      ...this.selectedStrings,
+      {
+        mail: selectedOption.mail,
+        name: this.startTag + selectedOption.displayName + this.endTag
+      }
+    ],
+
+    this.autocompleteStart = 0;
+    this.autocompleteEnd = 0;
+
+    this.setAutocompleteSelected(0);
+
     this.setState({
-      currentInput: newInput,
-      mailPositions: [
-        ...mailPositions,
-        {
-          mail: selectedOption.mail,
-          name: this.startTag + selectedOption.displayName + this.endTag
-        }
-      ],
-      autocompleteList: [],
-      autocompleteStart: 0,
-      autocompleteEnd: 0,
-      autocompleteState: false,
-      selected: 0
+      filteredList: []
     });
   }
 
   onSubmit(event) {
-    event.target.mailInput = this.replaceNamesWithMails(event);
+    event.target.mailInput = replace(event.target.input, this.selectedStrings);
   }
 
   onDelete(event) {
@@ -168,44 +171,34 @@ class AutocompleteInput extends Component {
           console.log(e);
           newInput = event.target.value;
         }
-        this.setState({
-          autocompleteState: false
-        });
+        this.setAutocompleteState(false);
         return newInput;
     }
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
 
-  setCurrentInput(event) {
-    this.setState({
-      currentInput: event.target.value
-    });
-  }
-
   performNavigation(event) {
-    const { autocompleteList, selected } = this.state;
+    const { filteredList } = this.state;
+    const { selected } = this.props;
 
     switch (event.keyCode) {
       case KEY_UP:
         event.preventDefault();
-        this.setState(prevState => ({
-          selected:
-            prevState.selected === 0
-              ? autocompleteList.length - 1
-              : prevState.selected - 1
-        }));
+        this.setAutocompleteSelected(
+          selected === 0 ? filteredList.length - 1 : prevState.selected - 1
+        );
         return;
 
       case KEY_DOWN:
         event.preventDefault();
-        this.setState(prevState => ({
-          selected: (prevState.selected + 1) % autocompleteList.length
-        }));
+        this.setAutocompleteSelected(
+          (prevState.selected + 1) % filteredList.length
+        );
         return;
 
       case KEY_ENTER:
-        if (autocompleteList[selected] === undefined) {
+        if (filteredList[selected] === undefined) {
           return;
         }
         event.preventDefault();
@@ -226,21 +219,22 @@ class AutocompleteInput extends Component {
       startIndex + 1,
       event.target.selectionStart
     );
-    const { dataList } = this.state;
+    const { dataList } = this.props;
     const matchingWords = this.matchWithArray(pattern, dataList);
 
+    this.setCurrentInput(event.target.value);
+    this.setAutocompleteState(true);
+
+    this.autocompleteStart = startIndex;
+    this.autocompleteEnd = event.target.selectionStart - 1;
+
     this.setState({
-      currentInput: event.target.value,
-      autocompleteState: true,
-      autocompleteStart: startIndex,
-      autocompleteEnd: event.target.selectionStart - 1,
-      autocompleteList: matchingWords
+      filteredList: matchingWords
     });
   }
 
-  checkAutocomplete(s, cursorPosition) {
-    const i = s.indexOf("@");
-    return i === cursorPosition - 1;
+  checkAutocomplete(s) {
+    return (s.includes("@") && s[i] === "@");
   }
 
   /* <<<<<<<<<<<<<<<<<<<< Helper functions >>>>>>>>>>>>>>>>>>>> */
@@ -287,22 +281,6 @@ class AutocompleteInput extends Component {
         result.push(dataList[i]);
       }
     }
-    return result;
-  }
-
-  replaceNamesWithMails(event) {
-    let input = event.target.value;
-    let result = input;
-    const { mailPositions } = this.state;
-
-    if (!mailPositions.length) {
-      return input;
-    }
-
-    for (let i = 0; i < mailPositions.length; i++) {
-      result = result.replace(mailPositions[i].name, mailPositions[i].mail);
-    }
-
     return result;
   }
 
@@ -362,98 +340,11 @@ class AutocompleteInput extends Component {
     };
   }
 
-  deleteName(input, start, end) {
-    return input.substring(0, start) + input.substr(end + 1);
-  }
-
-  checkContactStructure(contact, attributes) {
-    let temp = contact;
-
-    for (let i = 0; i < attributes.length; i++) {
-      if (temp[attributes[i]] == undefined) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  checkContactListStructure(contactList) {
-    for (let i = 0; i < contactList.length; i++) {
-      if (
-        !this.checkContactStructure(contactList[i], ["displayName", "mail"])
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  fetchContacts() {
-    let date = new Date().getHours();
-    let oldDate = Number(localStorage.getItem("date"));
-    let oldContacts = localStorage.getItem("contacts");
-
-    const { listUrl, refreshPeriod } = this.state;
-
-    if (oldContacts && date - oldDate < refreshPeriod) {
-      console.log("loaded from cache");
-      this.setState({
-        dataList: JSON.parse(localStorage.getItem("contacts"))
-      });
-      return;
-    }
-
-    let newContacts = [];
-
-    console.log(
-      "fetching data from ",
-      listUrl,
-      ", refresh period: ",
-      refreshPeriod
-    );
-
-    axios
-      .post(listUrl)
-      .then(
-        response => {
-          newContacts = response.data.json_list;
-
-          if (newContacts === undefined || newContacts.length == 0) {
-            throw new Error("Retrieved list of contacts is empty.");
-          }
-
-          if (!this.checkContactStructure(newContacts[0], ["displayName", "mail"])) {
-            throw new Error("Invalid contact structure.");
-          }
-
-          this.setState({
-            dataList: newContacts
-          });
-
-          localStorage.setItem("contacts", JSON.stringify(newContacts));
-          localStorage.setItem("date", new Date().getHours());
-
-          return;
-        },
-        reason => {
-          alert(
-            `Warning: contacts are not fetched, autocomplete is unavailable. \nReason: ${reason.message}`
-          );
-        }
-      )
-      .catch(error => {
-        alert(
-          `Warning: Error occured during contacts fetch, autocomplete is unavailable.\nReason: ${error.message}`
-          );
-      });
-  }
-
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
-  componentDidMount() {
-    this.fetchContacts();
-  }
+  // componentDidMount() {
+  //   this.fetchContacts();
+  // }
 
   componentDidUpdate() {
     if (this.activeItem) {
@@ -464,14 +355,8 @@ class AutocompleteInput extends Component {
   }
 
   render() {
-    const { inputFieldTextHint, disabledInput } = this.props;
-    const {
-      autocompleteState,
-      autocompleteList,
-      selected,
-      pageStart,
-      pageEnd
-    } = this.state;
+    const { selected, autocompleteState } = this.props;
+    const { filteredList } = this.state;
 
     return (
       <div className=" w-100">
@@ -485,10 +370,7 @@ class AutocompleteInput extends Component {
                   type="text"
                   className="new-message"
                   name="message"
-                  placeholder={inputFieldTextHint}
-                  disabled={disabledInput}
                   autoFocus
-                  autoComplete="off"
                   onKeyUp={this.onKeyUp}
                   onKeyDown={this.onKeyDown}
                   onSubmit={() => this.onSubmit(this)}
@@ -525,8 +407,7 @@ class AutocompleteInput extends Component {
                       className="custom-popper"
                       data-placement={placement}
                     >
-                      {autocompleteList
-                        .slice(pageStart, pageEnd)
+                      {filteredList
                         .map((item, i) => (
                           <div
                             key={i}
@@ -557,4 +438,21 @@ class AutocompleteInput extends Component {
   }
 }
 
-export default AutocompleteInput;
+const mapStateToProps = state => ({
+  dataList: state.autocomplete.get("dataList"),
+  autocompleteState: state.autocomplete.get("autocompleteState"),
+  currentInput: state.autocomplete.get("currentInput"),
+  selected: state.autocomplete.get("selected")
+});
+
+const mapDispatchToProps = dispatch => ({
+  setCurrentInput: input => dispatch(setAutocompleteCurrentInput(input)),
+  setAutocompleteState: autocompleteState =>
+    dispatch(setAutocompleteState(autocompleteState)),
+  setAutocompleteSelected: selected =>
+    dispatch(setAutocompleteSelected(selected)),
+  setAutocompletePositions: positions =>
+    dispatch(setAutocompletePositions(positions))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AutocompleteInput);
