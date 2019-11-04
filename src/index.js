@@ -63,8 +63,16 @@ const ConnectedWidget = (props) => {
         
         const onClick = (msg) => {
           console.log("The button says:", msg);
-          store.dispatch(sendMessage(msg))
-          store.dispatch(addUserMessage(msg))
+
+          try {
+            console.log("Attempting to dispatch sendMessage");
+            store.dispatch(sendMessage(msg));
+
+            console.log("Attempting to dispatch addUserMessage");
+            store.dispatch(addUserMessage(msg));
+          } catch (e) {
+            console.log("Error while dispatching from custom component:", e);
+          }
         };
     
         return (
