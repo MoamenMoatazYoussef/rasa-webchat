@@ -45,6 +45,21 @@ class Widget extends Component {
     this.state = {
       sessionId: null
     };
+
+    this.stateEventsHandler = this.stateEventsHandler.bind(this);
+    // this.sendMessage = this.sendMessage.bind(this);
+
+  }
+
+  stateEventsHandler() {
+    console.log("Inside the stateEventsHandler");
+    // if(!this.props) return;
+    // const toSend = this.props.toSend;
+    // if (toSend) {
+    //   console.log("About to send:", toSend);
+    //   // debugger;
+    //   this.sendMessage(toSend);
+    // }
   }
 
   componentDidMount() {
@@ -73,6 +88,9 @@ class Widget extends Component {
       .catch(error => {
         console.log(error);
       });
+
+
+    // store.subscribe(this.stateEventsHandler);
   }
 
   componentDidUpdate() {
@@ -172,7 +190,7 @@ class Widget extends Component {
 
     if (userUttered) {
       this.props.dispatch(addUserMessage(cleanMessage));
-      this.sendMessage(userUtteredWithMails);
+      this.props.dispatch(sendMessage(userUtteredWithMails));
     }
   };
 
@@ -224,14 +242,22 @@ class Widget extends Component {
   //TODO: ENDOF Moamen added this
 
   componentDidUpdate() {
-    const toSend = this.props.toSend;
-    console.log("About to send:", toSend);
-    if (toSend) {
-      this.sendMessage(toSend);
-    }
+    // const toSend = this.props.toSend;
+    // console.log("About to send:", toSend);
+    // if (toSend) {
+    //   this.sendMessage(toSend);
+    // }
   }
 
   render() {
+    
+    const toSend = this.props.toSend;
+    if (toSend) {
+      console.log("About to send:", toSend);
+      // debugger;
+      this.sendMessage(toSend);
+    }
+
     return (
       <WidgetLayout
         toggleChat={this.toggleConversation}

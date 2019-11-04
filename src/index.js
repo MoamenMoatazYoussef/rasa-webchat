@@ -63,8 +63,16 @@ const ConnectedWidget = (props) => {
         
         const onClick = (msg) => {
           console.log("The button says:", msg);
-          store.dispatch(sendMessage(msg))
-          store.dispatch(addUserMessage(msg))
+
+          try {
+            console.log("About to send button payload as message...");
+            store.dispatch(sendMessage(msg))
+            if(props.showCustomComponentMessage) {
+              store.dispatch(addUserMessage(msg));
+            }
+          } catch(e) {
+          console.log("Error while sending button message:", e);
+        }
         };
     
         return (

@@ -37,6 +37,7 @@ const plugin = {
 
         listUrl={args.listUrl}
         refreshPeriod={args.refreshPeriod}
+        showCustomComponentMessage={args.showCustomComponentMessage}
 
         customComponent={args.customComponent}
 
@@ -47,31 +48,32 @@ const plugin = {
 
 
 //TODO: Moamen added this
-plugin.init({
-  interval: 1000,
-  selector: "#webchat",
-  initPayload: "/help",
-  socketUrl: "http://10.10.19.158:5111/",
-  title: "Moamen is Awesome",
-  inputTextFieldHint: "Type a message...",
-  connectingText: "Waiting for server...",
-  hideWhenNotConnected: false,
-  docViewer: false,
-  listUrl: "http://10.10.19.158:5000/get_users_list",
-  refreshPeriod: 1,
+// plugin.init({
+//   interval: 1000,
+//   selector: "#webchat",
+//   initPayload: "/help",
+//   socketUrl: "http://10.10.19.158:5111/",
+//   title: "Moamen is Awesome",
+//   inputTextFieldHint: "Type a message...",
+//   connectingText: "Waiting for server...",
+//   hideWhenNotConnected: false,
+//   docViewer: false,
+//   listUrl: "http://10.10.19.158:5000/get_users_list",
+//   refreshPeriod: 1,
 
-  messageUrl: "http://10.10.19.158:5111/CatchMsg",
+//   messageUrl: "http://10.10.19.158:5111/CatchMsg",
+//   showCustomComponentMessage: false,
 
-  params: {
-    images: {
-      dims: {
-        width: 300,
-        height: 200
-      }
-    },
-    storage: "session"
-  }
-});
+//   params: {
+//     images: {
+//       dims: {
+//         width: 300,
+//         height: 200
+//       }
+//     },
+//     storage: "session"
+//   }
+// });
 //TODO: ENDOF Moamen added this
 
 export {
