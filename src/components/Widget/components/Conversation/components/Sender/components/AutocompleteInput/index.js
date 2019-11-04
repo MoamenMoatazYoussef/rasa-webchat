@@ -11,6 +11,8 @@ import {
   setAutocompletePositions
 } from "actions";
 
+import { connect } from 'react-redux';
+
 import { replace } from "../helper";
 
 import { KEY_DELETE, KEY_ENTER, KEY_UP, KEY_DOWN } from '../../../../../../../../constants';

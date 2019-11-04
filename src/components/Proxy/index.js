@@ -1,7 +1,6 @@
-import { setAutocompleteList, setAutocompleteCallDestination } from "actions";
 import axios from "axios";
-
 import { connect } from "react-redux";
+import { setAutocompleteList } from "actions";
 
 class AutocompleteProxy {
     // constructor(props) {
@@ -102,9 +101,8 @@ class MessageProxy {
     }
 }
 
-class Proxy extends Component {
-    constructor(props) {
-
+class Proxy {
+    constructor() {
         const acProps = {
 
         }
@@ -127,14 +125,14 @@ class Proxy extends Component {
 }
 
 
-// const mapStateToProps = state => ({
-//     callDestination: state.autocomplete.get("callDestination"),
-//     refreshPeriod: state.autocomplete.get("refreshPeriod")
-// });
+const mapStateToProps = state => ({
+    callDestination: state.autocomplete.get("callDestination"),
+    refreshPeriod: state.autocomplete.get("refreshPeriod")
+});
 
-// const mapDispatchToProps = dispatch => ({
-//     setAutocompleteCallDestination: (callDestination) => dispatch(setAutocompleteCallDestination(callDestination)),
-//     setAutocompleteList: (list) => dispatch(setAutocompleteList(list))
-// });
+const mapDispatchToProps = dispatch => ({
+    setAutocompleteCallDestination: (callDestination) => dispatch(setAutocompleteCallDestination(callDestination)),
+    setAutocompleteList: (list) => dispatch(setAutocompleteList(list))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Proxy);
