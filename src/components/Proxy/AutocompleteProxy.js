@@ -45,8 +45,6 @@ class AutocompleteProxy {
 
         let newElements = [];
 
-        console.log(callDestination);
-
         axios
             .post(callDestination)
             .then(

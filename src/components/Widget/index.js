@@ -30,6 +30,7 @@ import AutocompleteProxy from "../Proxy/AutocompleteProxy";
 import MessageProxy from "../Proxy/MessageProxy";
 
 import { store } from "../../store/store";
+import watch from "redux-watch";
 
 class Widget extends Component {
   constructor(props) {
@@ -53,10 +54,27 @@ class Widget extends Component {
     this.msgProxy = new MessageProxy();
 
     this.stateEventsHandler = this.stateEventsHandler.bind(this);
+
+    let w = watch(store.getState, ["behavior"]);
+    console.log(w);
+    store.subscribe(
+      w((newVal, oldVal, objectPath) => {
+        this.stateEventsHandler({
+          newVal,
+          oldVal,
+          objectPath
+        });
+      })
+      // this.stateEventsHandler
+    );
   }
 
-  stateEventsHandler() {
-    // TODO: use redux-watch here
+  stateEventsHandler(props) {
+    const toSend = props.newVal.get("toSend");
+    console.log(toSend);
+    if (toSend !== null && toSend !== undefined) {
+      this.sendIfStateChanged(toSend);
+    }
   }
 
   componentDidMount() {
@@ -215,27 +233,22 @@ class Widget extends Component {
     }, this.props.interval);
   }
 
-  componentDidUpdate() {
-    const toSend = this.props.toSend;
+  sendIfStateChanged(toSend) {
     const { sessionId } = this.state;
-    console.log("toSend: ", toSend);
-    if (toSend) {
-      this.msgProxy
-        .sendMessage(toSend, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response));
-    }
+
+    if (toSend == null || toSend == undefined) return;
+    console.log("About to send a message:", toSend);
+    this.msgProxy
+      .sendMessage(toSend, sessionId, this.props.messageUrl)
+      .then(response => this.prepareForDispatch(response));
+  }
+
+  componentDidUpdate() {
+    // this.sendIfStateChanged(this.props.toSend);
   }
 
   render() {
-
-    const toSend = this.props.toSend;
-    const { sessionId } = this.state;
-    console.log("toSend: ", toSend);
-    if (toSend) {
-      this.msgProxy
-        .sendMessage(toSend, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response));
-    }
+    // this.sendIfStateChanged(this.props.toSend);
 
     return (
       <WidgetLayout

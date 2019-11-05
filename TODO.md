@@ -15,17 +15,18 @@
 <!--    - Refactor messageReducer.js -->
 <!-- - Add additional no "@" state to Autocomplete logic. -->
 <!-- - Remove unused props sent to AC from Sender.js -->
+
 <!-- - **Test Phase 1 working.** -->
 
 ### Phase 2
 <!-- - Remove myCustomComponent.js -->
 <!-- - Remove all comments from and refactor msgProcessor.js -->
-- Refactor Widget:
-    <!-- + Extract message sending to MessageProxy.js -->
-    <!-- + Remove all comments and console logs -->
-    + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`)
+<!-- - Refactor Widget: -->
+<!-- + Extract message sending to MessageProxy.js -->
+<!-- + Remove all comments and console logs -->
+<!-- + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`) -->
 
-- **Test Phase 2 working.**
+<!-- - **Test Phase 2 working.** -->
 
 ### Phase 3
 - Extract customComponent to outside configuration.

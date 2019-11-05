@@ -12,7 +12,8 @@ export default function (inputFieldTextHint, connectingText, storage, docViewer 
     disabledInput: true,
     docViewer,
     inputFieldTextHint,
-    connectingText
+    connectingText,
+    toSend: null
   });
 
   return function reducer(state = initialState, action) {
