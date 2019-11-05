@@ -86,10 +86,7 @@ class Widget extends Component {
         console.log(error);
       });
 
-    this.acProxy.fetchElements(
-      this.props.callDestination,
-      this.props.refreshPeriod
-    );
+    this.acProxy.fetchElements(this.props.listUrl, this.props.refreshPeriod);
   }
 
   componentDidUpdate() {
@@ -113,10 +110,10 @@ class Widget extends Component {
   trySendInitPayload = () => {
     const { initPayload } = this.props;
     const { sessionId } = this.state;
-    debugger;
 
-      this.msgProxy.sendMessage(initPayload, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response))
+    this.msgProxy
+      .sendMessage(initPayload, sessionId, this.props.messageUrl)
+      .then(response => this.prepareForDispatch(response));
     this.props.dispatch(initialize());
   };
 
@@ -196,11 +193,9 @@ class Widget extends Component {
       const { sessionId } = this.state;
 
       this.props.dispatch(addUserMessage(cleanMessage));
-        this.msgProxy.sendMessage(
-          userUtteredWithMails,
-          sessionId,
-          this.props.messageUrl
-        ).then(response => this.prepareForDispatch(response))
+      this.msgProxy
+        .sendMessage(userUtteredWithMails, sessionId, this.props.messageUrl)
+        .then(response => this.prepareForDispatch(response));
     }
   };
 
@@ -209,26 +204,39 @@ class Widget extends Component {
   }
 
   prepareForDispatch(response) {
-      if (response.length == 0) {
-        return;
-      }
+    if (response.length == 0) {
+      return;
+    }
 
-      setTimeout(() => {
-        response.forEach(message => {
-          this.dispatchMessage(message);
-        });
-      }, this.props.interval);
+    setTimeout(() => {
+      response.forEach(message => {
+        this.dispatchMessage(message);
+      });
+    }, this.props.interval);
   }
 
   componentDidUpdate() {
     const toSend = this.props.toSend;
+    const { sessionId } = this.state;
+    console.log("toSend: ", toSend);
     if (toSend) {
-        this.msgProxy.sendMessage(toSend, sessionId, this.props.messageUrl)
-          .then(response => this.prepareForDispatch(response))
+      this.msgProxy
+        .sendMessage(toSend, sessionId, this.props.messageUrl)
+        .then(response => this.prepareForDispatch(response));
     }
   }
 
   render() {
+
+    const toSend = this.props.toSend;
+    const { sessionId } = this.state;
+    console.log("toSend: ", toSend);
+    if (toSend) {
+      this.msgProxy
+        .sendMessage(toSend, sessionId, this.props.messageUrl)
+        .then(response => this.prepareForDispatch(response));
+    }
+
     return (
       <WidgetLayout
         toggleChat={this.toggleConversation}
