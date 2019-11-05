@@ -21,8 +21,8 @@
 <!-- - Remove myCustomComponent.js -->
 <!-- - Remove all comments from and refactor msgProcessor.js -->
 - Refactor Widget:
-    + Extract message sending to MessageProxy.js
-    + Remove all comments and console logs
+    <!-- + Extract message sending to MessageProxy.js -->
+    <!-- + Remove all comments and console logs -->
     + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`)
 
 - **Test Phase 2 working.**
@@ -38,3 +38,8 @@
 - Rename properties passed from configuration.
 
 - **Test Phase 3 working.**
+
+### Phase 4
+- Add "key" to button loop in custom component.
+- Create component List.js
+- Refactor Autocomplete: take List component outside.

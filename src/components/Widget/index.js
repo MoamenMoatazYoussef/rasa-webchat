@@ -35,7 +35,6 @@ class Widget extends Component {
   constructor(props) {
     super(props);
 
-
     this.messages = [];
     setInterval(() => {
       if (this.messages.length > 0) {
@@ -50,10 +49,10 @@ class Widget extends Component {
       sessionId: null // TODO: Take it out of local state?
     };
 
-    this.acproxy = new AutocompleteProxy();
+    this.acProxy = new AutocompleteProxy();
+    this.msgProxy = new MessageProxy();
 
     this.stateEventsHandler = this.stateEventsHandler.bind(this);
-
   }
 
   stateEventsHandler() {
@@ -87,14 +86,10 @@ class Widget extends Component {
         console.log(error);
       });
 
-
-    // store.subscribe(this.stateEventsHandler);
-
-    this.acproxy.fetchElements(
-      this.props.callDestination, this.props.refreshPeriod
+    this.acProxy.fetchElements(
+      this.props.callDestination,
+      this.props.refreshPeriod
     );
-
-    
   }
 
   componentDidUpdate() {
@@ -117,7 +112,11 @@ class Widget extends Component {
 
   trySendInitPayload = () => {
     const { initPayload } = this.props;
-    this.sendMessage(initPayload);
+    const { sessionId } = this.state;
+    debugger;
+
+      this.msgProxy.sendMessage(initPayload, sessionId, this.props.messageUrl)
+        .then(response => this.prepareForDispatch(response))
     this.props.dispatch(initialize());
   };
 
@@ -166,9 +165,12 @@ class Widget extends Component {
       if (this.props.customComponent) {
         this.props.dispatch(
           renderCustomComponent(
-            this.props.customComponent(message, (message) => this.props.dispatch(sendMessage(message)))
-            , props, true
-            )
+            this.props.customComponent(message, message =>
+              this.props.dispatch(sendMessage(message))
+            ),
+            props,
+            true
+          )
         );
       }
     }
@@ -191,61 +193,38 @@ class Widget extends Component {
     event.target.message.value = "";
 
     if (userUttered) {
+      const { sessionId } = this.state;
+
       this.props.dispatch(addUserMessage(cleanMessage));
-      this.sendMessage(userUtteredWithMails);
+        this.msgProxy.sendMessage(
+          userUtteredWithMails,
+          sessionId,
+          this.props.messageUrl
+        ).then(response => this.prepareForDispatch(response))
     }
   };
 
-  //TODO: Moamen added this
   removeTags(input) {
     return input.replace(/@/g, "").replace(/\f/g, "");
   }
 
-  sendMessage(toSend) {
-    if(!toSend) {
-      return;
-    }
-    const { sessionId } = this.state;
+  prepareForDispatch(response) {
+      if (response.length == 0) {
+        return;
+      }
 
-    let headers = new Headers();
-    headers.append("X-Requested-With", "XMLHttpRequest");
-
-    axios
-      .post(
-        this.messageUrl,
-        {
-          text: toSend,
-          session_id: sessionId
-        },
-        { headers: headers }
-      )
-      .then(response => {
-        if (response.data.length == 0) {
-          return;
-        }
-
-        setTimeout(() => {
-          response.data.forEach(message => {
-            this.dispatchMessage(message);
-          });
-        }, this.props.interval);
-      })
-      .catch(error => {
-        console.log("Error during sending/receiving a message:", error);
-        this.messages.push([
-          {
-            text: "An error has occured, conversation restarted...",
-            session_id: sessionId
-          }
-        ]);
-      });
+      setTimeout(() => {
+        response.forEach(message => {
+          this.dispatchMessage(message);
+        });
+      }, this.props.interval);
   }
-  //TODO: ENDOF Moamen added this
 
   componentDidUpdate() {
     const toSend = this.props.toSend;
     if (toSend) {
-      this.sendMessage(toSend);
+        this.msgProxy.sendMessage(toSend, sessionId, this.props.messageUrl)
+          .then(response => this.prepareForDispatch(response))
     }
   }
 
@@ -282,12 +261,7 @@ const mapStateToProps = state => ({
   isChatOpen: state.behavior.get("isChatOpen"),
   isChatVisible: state.behavior.get("isChatVisible"),
   toSend: state.behavior.get("toSend")
-
 });
-
-// const mapDispatchToProps = dispatch => ({
-//   sendNewMessage: msg => dispatch(sendMessage(msg))
-// });
 
 Widget.propTypes = {
   interval: PropTypes.number,
