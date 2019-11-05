@@ -11,21 +11,17 @@ import "./styles.scss";
 import ReactMarkdown from 'react-markdown';
 
 const ConnectedWidget = (props) => {
-  const sock = null;
   
-  //const storage = props.params.storage == "session" ? sessionStorage : localStorage
-  const storage = sessionStorage;
+  const storage = props.params.storage == "session" ? sessionStorage : localStorage;
   initStore(
     props.inputTextFieldHint,
     props.connectingText,
-    sock,
     storage,
     props.docViewer,
   );
 
   return (<Provider store={store}>
     <Widget
-      socket={sock}
       interval={props.interval}
       initPayload={props.initPayload}
       title={props.title}

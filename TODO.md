@@ -22,28 +22,28 @@
 <!-- - Remove myCustomComponent.js -->
 <!-- - Remove all comments from and refactor msgProcessor.js -->
 <!-- - Refactor Widget: -->
-<!-- + Extract message sending to MessageProxy.js -->
-<!-- + Remove all comments and console logs -->
-<!-- + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`) -->
+<!--    + Extract message sending to MessageProxy.js -->
+<!--    + Remove all comments and console logs -->
+<!--    + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`) -->
 
 <!-- - **Test Phase 2 working.** -->
 
 ### Phase 3
 
 <!-- - Remove mySocket. -->
-- Remove Socket.io
+<!-- - Remove Socket.io -->
 - Organize Widget.js and Autocomplete.js:
     + Split functions into smaller ones.
     + Organize functions.
 
 <!-- - Gather all constants and put them in constants.js -->
-- Allow configurable sessionStorage / localStorage
-- Rename properties passed from configuration.
-- Extract customComponent to outside configuration.
+<!-- - Allow configurable sessionStorage / localStorage -->
+<!-- - Rename properties passed from configuration. -->
 
 - **Test Phase 3 working.**
 
 ### Phase 4
-- Add "key" to button loop in custom component.
+<!-- - Add "key" to button loop in custom component. -->
 - Create component List.js
 - Refactor Autocomplete: take List component outside.
+- Extract customComponent to outside configuration.
