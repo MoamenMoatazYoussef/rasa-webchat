@@ -24,7 +24,7 @@
     + Create new component Proxy.js
     + Extract message sending to Proxy.js
     + Remove all comments and console logs
-    + Use connect() or subscribe() insead of the render() workaround
+    + Use connect() or subscribe() insead of the render() workaround (use `redux-watch`)
 
 - **Test Phase 2 working.**
 

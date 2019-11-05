@@ -26,12 +26,16 @@ import { getLocalSession } from "../../store/reducers/helper";
 import { SESSION_NAME } from "constants";
 
 import axios from "axios";
-import Proxy from "../Proxy";
+import AutocompleteProxy from "../Proxy/AutocompleteProxy";
+import MessageProxy from "../Proxy/MessageProxy";
+
 import { store } from "../../store/store";
 
 class Widget extends Component {
   constructor(props) {
     super(props);
+
+
     this.messages = [];
     setInterval(() => {
       if (this.messages.length > 0) {
@@ -39,18 +43,16 @@ class Widget extends Component {
       }
     }, this.props.interval);
 
-    this.mySocket = this.props.socket;
     this.messageUrl = this.props.messageUrl;
     this.socketUrl = "http://10.10.19.158:5111";
 
     this.state = {
-      sessionId: null
+      sessionId: null // TODO: Take it out of local state?
     };
 
-    this.proxy = new Proxy(props);
+    this.acproxy = new AutocompleteProxy();
 
     this.stateEventsHandler = this.stateEventsHandler.bind(this);
-    // this.sendMessage = this.sendMessage.bind(this);
 
   }
 
@@ -95,7 +97,7 @@ class Widget extends Component {
 
     // store.subscribe(this.stateEventsHandler);
 
-    this.proxy.getAutocompleteProxy().fetchElements(
+    this.acproxy.fetchElements(
       this.props.callDestination, this.props.refreshPeriod
     );
 
