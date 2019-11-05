@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -30,6 +29,7 @@ import AutocompleteProxy from "../Proxy/AutocompleteProxy";
 import MessageProxy from "../Proxy/MessageProxy";
 
 import { store } from "../../store/store";
+import watch from "redux-watch";
 
 class Widget extends Component {
   constructor(props) {
@@ -53,19 +53,29 @@ class Widget extends Component {
     this.msgProxy = new MessageProxy();
 
     this.stateEventsHandler = this.stateEventsHandler.bind(this);
+
+    let w = watch(store.getState, ["behavior"]);
+    store.subscribe(
+      w((newVal, oldVal, objectPath) => {
+        this.stateEventsHandler({
+          newVal,
+          oldVal,
+          objectPath
+        });
+      })
+    );
   }
 
-  stateEventsHandler() {
-    // TODO: use redux-watch here
+  stateEventsHandler(props) {
+    const toSend = props.newVal.get("toSend");
+    if (toSend !== null && toSend !== undefined) {
+      this.sendIfStateChanged(toSend);
+    }
   }
 
   componentDidMount() {
     this.props.dispatch(pullSession());
     this.props.dispatch(connectServer());
-    try {
-    } catch (error) {
-      console.log(error);
-    }
 
     if (this.props.embedded && this.props.initialized) {
       this.props.dispatch(showChat());
@@ -215,27 +225,21 @@ class Widget extends Component {
     }, this.props.interval);
   }
 
-  componentDidUpdate() {
-    const toSend = this.props.toSend;
+  sendIfStateChanged(toSend) {
     const { sessionId } = this.state;
-    console.log("toSend: ", toSend);
-    if (toSend) {
-      this.msgProxy
-        .sendMessage(toSend, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response));
-    }
+
+    if (toSend == null || toSend == undefined) return;
+    this.msgProxy
+      .sendMessage(toSend, sessionId, this.props.messageUrl)
+      .then(response => this.prepareForDispatch(response));
+  }
+
+  componentDidUpdate() {
+    // this.sendIfStateChanged(this.props.toSend);
   }
 
   render() {
-
-    const toSend = this.props.toSend;
-    const { sessionId } = this.state;
-    console.log("toSend: ", toSend);
-    if (toSend) {
-      this.msgProxy
-        .sendMessage(toSend, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response));
-    }
+    // this.sendIfStateChanged(this.props.toSend);
 
     return (
       <WidgetLayout
@@ -262,14 +266,6 @@ class Widget extends Component {
     );
   }
 }
-
-const mapStateToProps = state => ({
-  initialized: state.behavior.get("initialized"),
-  connected: state.behavior.get("connected"),
-  isChatOpen: state.behavior.get("isChatOpen"),
-  isChatVisible: state.behavior.get("isChatVisible"),
-  toSend: state.behavior.get("toSend")
-});
 
 Widget.propTypes = {
   interval: PropTypes.number,
@@ -298,5 +294,13 @@ Widget.defaultProps = {
   isChatOpen: false,
   isChatVisible: true
 };
+
+const mapStateToProps = state => ({
+  initialized: state.behavior.get("initialized"),
+  connected: state.behavior.get("connected"),
+  isChatOpen: state.behavior.get("isChatOpen"),
+  isChatVisible: state.behavior.get("isChatVisible"),
+  toSend: state.behavior.get("toSend")
+});
 
 export default connect(mapStateToProps, null)(Widget);

@@ -82,9 +82,10 @@ const ConnectedWidget = (props) => {
     
               <div>
                 {
-                  buttons && buttons.map(btn => {
+                  buttons && buttons.map((btn, index) => {
                     return(
                       <input 
+                        key={index}
                         className="my-button"
                         type="button" 
                         value={btn.title} 

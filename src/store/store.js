@@ -16,7 +16,7 @@ function initStore(hintText, connectingText, socket, storage, docViewer = false)
     const session_id = (getLocalSession(storage, SESSION_NAME)? getLocalSession(storage, SESSION_NAME).session_id: null);
     switch (action.type) {
       case actionTypes.EMIT_NEW_USER_MESSAGE: {
-        socket.emit("user_uttered", { message: action.text, customData: socket.customData, session_id });
+        // socket.emit("user_uttered", { message: action.text, customData: socket.customData, session_id });
       }
       case actionTypes.GET_OPEN_STATE: {
         return store.getState().behavior.get("isChatOpen");

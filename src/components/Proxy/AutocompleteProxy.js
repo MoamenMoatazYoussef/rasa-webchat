@@ -1,5 +1,4 @@
 import axios from "axios";
-import watch from 'redux-watch';
 import {
     setAutocompleteList
 } from "actions";
@@ -44,8 +43,6 @@ class AutocompleteProxy {
         }
 
         let newElements = [];
-
-        console.log(callDestination);
 
         axios
             .post(callDestination)
