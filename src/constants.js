@@ -112,8 +112,9 @@ export const PROP_TYPES = {
 
 };
 
-
 export const KEY_DOWN = 40;
 export const KEY_UP = 38;
 export const KEY_ENTER = 13;
 export const KEY_DELETE = 8;
+
+export const GET_TOKEN_FN = "/getToken";

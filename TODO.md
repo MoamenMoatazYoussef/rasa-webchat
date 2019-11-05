@@ -30,13 +30,13 @@
 
 ### Phase 3
 
-- Remove mySocket.
+<!-- - Remove mySocket. -->
 - Remove Socket.io
 - Organize Widget.js and Autocomplete.js:
     + Split functions into smaller ones.
     + Organize functions.
 
-- Gather all constants and put them in constants.js
+<!-- - Gather all constants and put them in constants.js -->
 - Allow configurable sessionStorage / localStorage
 - Rename properties passed from configuration.
 - Extract customComponent to outside configuration.

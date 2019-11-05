@@ -1,23 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect, Provider } from 'react-redux';
+import { Provider } from 'react-redux';
 
 import { sendMessage, addUserMessage } from "actions";
 
 import Widget from './components/Widget';
 import { store, initStore } from '../src/store/store';
-import mySocket from "./mysocket";
 
 import "./styles.scss";
 import ReactMarkdown from 'react-markdown';
 
-const MAX_TIMEOUT = 480000;
-
 const ConnectedWidget = (props) => {
-  // const sock = socket(props.socketUrl, props.customData, props.socketPath);
-  const sock = new mySocket(props.socketUrl, props.messageUrl, MAX_TIMEOUT);
+  const sock = null;
   
-  //TODO: Moamen modified this
   //const storage = props.params.storage == "session" ? sessionStorage : localStorage
   const storage = sessionStorage;
   initStore(
@@ -144,11 +139,5 @@ ConnectedWidget.defaultProps = {
   },
   docViewer: false
 };
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     onClick: msg => dispatch(sendMessage(msg))
-//   }
-// }
 
 export default ConnectedWidget;

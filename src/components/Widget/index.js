@@ -22,7 +22,7 @@ import { isSnippet, isVideo, isImage, isQR, isText } from "./msgProcessor";
 import WidgetLayout from "./layout";
 
 import { getLocalSession } from "../../store/reducers/helper";
-import { SESSION_NAME } from "constants";
+import { SESSION_NAME, GET_TOKEN_FN } from "constants";
 
 import axios from "axios";
 import AutocompleteProxy from "../Proxy/AutocompleteProxy";
@@ -82,10 +82,9 @@ class Widget extends Component {
       this.props.dispatch(openChat());
     }
 
-    const getTokenFunction = "/getToken";
 
     axios
-      .get(this.socketUrl + getTokenFunction)
+      .get(this.socketUrl + GET_TOKEN_FN)
       .then(response => {
         this.setState({
           sessionId: response.data.session_id
@@ -234,13 +233,7 @@ class Widget extends Component {
       .then(response => this.prepareForDispatch(response));
   }
 
-  componentDidUpdate() {
-    // this.sendIfStateChanged(this.props.toSend);
-  }
-
   render() {
-    // this.sendIfStateChanged(this.props.toSend);
-
     return (
       <WidgetLayout
         toggleChat={this.toggleConversation}
