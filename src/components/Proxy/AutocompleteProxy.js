@@ -6,17 +6,7 @@ import {
 import { store } from "../../store/store";
 
 class AutocompleteProxy {
-    constructor() {
-        // super();
-        // let w = watch(store.getState, 
-        //     ['autocomplete.callDestination', 'autocomplete.refreshPeriod']
-        // );
-        
-        // store.subscribe(w((newVal, oldVal, objectPath) => {
-        //     console.log('%s changed from %s to %s', objectPath, oldVal, newVal)
-        // }))
-        // store.subscribe(this.stateEventsHandler);
-    }
+    constructor() {}
 
     setAutocompleteList = list => store.dispatch(setAutocompleteList(list))
 
@@ -49,19 +39,11 @@ class AutocompleteProxy {
         let oldElements = localStorage.getItem("elements");
 
         if (oldElements && date - oldDate < refreshPeriod) {
-            console.log("loaded from cache");
             this.setAutocompleteList(JSON.parse(localStorage.getItem("elements")));
             return;
         }
 
         let newElements = [];
-
-        console.log(
-            "fetching data from ",
-            callDestination,
-            ", refresh period: ",
-            refreshPeriod
-        );
 
         axios
             .post(callDestination)
@@ -100,5 +82,4 @@ class AutocompleteProxy {
     }
 }
 
-// export default connect(mapStateToProps, mapDispatchToProps)(AutocompleteProxy);
 export default AutocompleteProxy;

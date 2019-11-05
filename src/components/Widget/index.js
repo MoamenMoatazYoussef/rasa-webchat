@@ -57,14 +57,7 @@ class Widget extends Component {
   }
 
   stateEventsHandler() {
-    console.log("Inside the stateEventsHandler");
-    // if(!this.props) return;
-    // const toSend = this.props.toSend;
-    // if (toSend) {
-    //   console.log("About to send:", toSend);
-    //   // debugger;
-    //   this.sendMessage(toSend);
-    // }
+    // TODO: use redux-watch here
   }
 
   componentDidMount() {
@@ -179,8 +172,6 @@ class Widget extends Component {
         );
       }
     }
-
-    console.log("-------------------------------------------");
   }
 
   handleMessageSubmit = event => {
@@ -211,7 +202,6 @@ class Widget extends Component {
   }
 
   sendMessage(toSend) {
-    console.log("Sending:", toSend);
     if(!toSend) {
       return;
     }
@@ -254,7 +244,6 @@ class Widget extends Component {
 
   componentDidUpdate() {
     const toSend = this.props.toSend;
-    console.log("About to send:", toSend);
     if (toSend) {
       this.sendMessage(toSend);
     }

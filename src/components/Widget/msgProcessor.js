@@ -22,18 +22,8 @@ export function isImage(message) {
 }
 
 export function isText(message) {
-  // console.log(Object.keys(message).length === 2);
-  // console.log(Object.keys(message).includes('text'));
-  // return Object.keys(message).includes('text');
   return Object.keys(message).length === 2 && Object.keys(message).includes('text');
 }
-
-// export function isText(message) {
-//   return (!(
-//       isImage(message) or 
-//     )
-//   );
-// }
 
 export function isArrayOfTexts(message) {
   return false;

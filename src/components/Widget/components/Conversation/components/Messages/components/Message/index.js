@@ -13,7 +13,6 @@ class Message extends PureComponent {
     const sender = this.props.message.get('sender');
     const text = this.props.message.get('text');
 
-    console.log("Inside the message component:", this.props.message);
     return (
       <div className={sender}>
         <div className="message-text">
