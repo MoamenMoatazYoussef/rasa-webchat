@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import { Manager, Reference, Popper } from "react-popper";
 
-import "../../style.scss";
-import "./style.scss";
-
 import {
   setAutocompleteState,
   setAutocompleteCurrentInput,
@@ -14,8 +11,10 @@ import {
 import { connect } from 'react-redux';
 
 import { replace } from "../helper";
-
 import { KEY_DELETE, KEY_ENTER, KEY_UP, KEY_DOWN } from '../../../../../../../../constants';
+
+import "../../style.scss";
+import "./style.scss";
 
 class AutocompleteInput extends Component {
   constructor(props) {
@@ -30,6 +29,12 @@ class AutocompleteInput extends Component {
     this.endTag = "\f";
     this.autocompleteStart = 0;
     this.autocompleteEnd = 0;
+
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onDelete = this.onDelete.bind(this);
 
     this.performNavigation = this.performNavigation.bind(this);
     this.performAutocomplete = this.performAutocomplete.bind(this);
@@ -62,10 +67,11 @@ class AutocompleteInput extends Component {
     const { autocompleteState } = this.props;
 
     const i = event.target.selectionStart - 1;
-    const newAutocompleteState = this.checkAutocomplete(event.target.value);
+    const newAutocompleteState = this.checkAutocomplete(event.target.value, i);
      // (event.target.value.includes("@") && event.target.value[i] === "@");
 
     if (autocompleteState || newAutocompleteState) {
+      this.setAutocompleteSelected(0);
       this.performNavigation(event);
     } else {
       if (event.keyCode === KEY_ENTER) {
@@ -79,12 +85,13 @@ class AutocompleteInput extends Component {
     const { currentInput, autocompleteState } = this.props;
 
     const i = event.target.selectionStart - 1;
-    const newAutocompleteState = this.checkAutocomplete(event.target.value);
+    const newAutocompleteState = this.checkAutocomplete(event.target.value, i);
     // (event.target.value.includes("@") && event.target.value[i] === "@");
 
     const changed = event.target.value !== currentInput;
 
     if (changed && (autocompleteState || newAutocompleteState)) {
+      this.setAutocompleteSelected(0);
       this.performAutocomplete(event, i);
     } else {
       if (event.keyCode === KEY_ENTER) {
@@ -188,14 +195,14 @@ class AutocompleteInput extends Component {
       case KEY_UP:
         event.preventDefault();
         this.setAutocompleteSelected(
-          selected === 0 ? filteredList.length - 1 : prevState.selected - 1
+          selected === 0 ? filteredList.length - 1 : selected - 1
         );
         return;
 
       case KEY_DOWN:
         event.preventDefault();
         this.setAutocompleteSelected(
-          (prevState.selected + 1) % filteredList.length
+          (selected + 1) % filteredList.length
         );
         return;
 
@@ -235,7 +242,7 @@ class AutocompleteInput extends Component {
     });
   }
 
-  checkAutocomplete(s) {
+  checkAutocomplete(s, i) {
     return (s.includes("@") && s[i] === "@");
   }
 
