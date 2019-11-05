@@ -33,7 +33,7 @@ class AutocompleteInput extends Component {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onClick = this.onClick.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+    // this.onSubmit = this.onSubmit.bind(this);
     this.onDelete = this.onDelete.bind(this);
 
     this.performNavigation = this.performNavigation.bind(this);
@@ -75,7 +75,7 @@ class AutocompleteInput extends Component {
       this.performNavigation(event);
     } else {
       if (event.keyCode === KEY_ENTER) {
-        event.target.mailInput = replace(event.target.input, this.selectedStrings);
+        event.target.mailInput = replace(event.target.value, this.selectedStrings);
         return;
       }
     }
@@ -95,7 +95,8 @@ class AutocompleteInput extends Component {
       this.performAutocomplete(event, i);
     } else {
       if (event.keyCode === KEY_ENTER) {
-        this.onSubmit(event);
+        // this.onSubmit(event);
+        event.target.mailInput = replace(event.target.value, this.selectedStrings);
       } else {
         this.setCurrentInput(event.target.value);
       }
@@ -154,7 +155,10 @@ class AutocompleteInput extends Component {
   }
 
   onSubmit(event) {
-    event.target.mailInput = replace(event.target.input, this.selectedStrings);
+    // event.target.mailInput = replace(
+    //   event.target.value, 
+    //   this.selectedStrings
+    // );
   }
 
   onDelete(event) {
@@ -380,9 +384,10 @@ class AutocompleteInput extends Component {
                   className="new-message"
                   name="message"
                   autoFocus
+                  autoComplete="off"
                   onKeyUp={this.onKeyUp}
                   onKeyDown={this.onKeyDown}
-                  onSubmit={() => this.onSubmit(this)}
+                  // onSubmit={() => this.onSubmit(this)}
                 />
               )}
             </Reference>

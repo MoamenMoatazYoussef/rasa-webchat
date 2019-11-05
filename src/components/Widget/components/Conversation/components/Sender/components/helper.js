@@ -6,9 +6,7 @@ export function replace(inputString, elements) {
     }
 
     elements.forEach(element => {
-        result = result.replace(
-            element,
-            this.replaceMap[element]);
+        result = result.replace(element.name, element.mail);
     });
 
     return result;
