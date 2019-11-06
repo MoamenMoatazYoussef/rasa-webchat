@@ -66,55 +66,44 @@ class Widget extends Component {
     );
   }
 
+  /* <<<<<<<<<<<<<<<<<<<< Redux functions >>>>>>>>>>>>>>>>>>>> */
+  
   stateEventsHandler(props) {
     const toSend = props.newVal.get("toSend");
     if (toSend !== null && toSend !== undefined) {
       this.sendIfStateChanged(toSend);
     }
   }
+  
+  /* <<<<<<<<<<<<<<<<<<<< Event handlers >>>>>>>>>>>>>>>>>>>> */
 
-  componentDidMount() {
-    this.props.dispatch(pullSession());
-    this.props.dispatch(connectServer());
+  handleMessageSubmit = event => {
+    event.preventDefault();
+    const userUttered = event.target.message.value;
+    let userUtteredWithMails = userUttered;
 
-    if (this.props.embedded && this.props.initialized) {
-      this.props.dispatch(showChat());
-      this.props.dispatch(openChat());
+    if (
+      event.target.message.mailInput !== undefined &&
+      event.target.message.mailInput !== ""
+    ) {
+      userUtteredWithMails = event.target.message.mailInput;
     }
 
+    let cleanMessage = this.removeTags(userUttered);
 
-    axios
-      .get(this.socketUrl + GET_TOKEN_FN)
-      .then(response => {
-        this.setState({
-          sessionId: response.data.session_id
-        });
-        this.trySendInitPayload();
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    event.target.message.value = "";
 
-    this.acProxy.fetchElements(this.props.listUrl, this.props.refreshPeriod);
-  }
+    if (userUttered) {
+      const { sessionId } = this.state;
 
-  componentDidUpdate() {
-    this.props.dispatch(pullSession());
-    if (this.props.embedded && this.props.initialized) {
-      this.props.dispatch(showChat());
-      this.props.dispatch(openChat());
+      this.props.dispatch(addUserMessage(cleanMessage));
+      this.msgProxy
+        .sendMessage(userUtteredWithMails, sessionId, this.props.messageUrl)
+        .then(response => this.prepareForDispatch(response));
     }
-  }
+  };
 
-  componentWillUnmount() {}
-
-  getSessionId() {
-    const { storage } = this.props;
-    const localSession = getLocalSession(storage, SESSION_NAME);
-
-    const local_id = localSession ? localSession.session_id : null;
-    return local_id;
-  }
+  /* <<<<<<<<<<<<<<<<<<<< Business logic functions >>>>>>>>>>>>>>>>>>>> */
 
   trySendInitPayload = () => {
     const { initPayload } = this.props;
@@ -124,10 +113,6 @@ class Widget extends Component {
       .sendMessage(initPayload, sessionId, this.props.messageUrl)
       .then(response => this.prepareForDispatch(response));
     this.props.dispatch(initialize());
-  };
-
-  toggleConversation = () => {
-    this.props.dispatch(toggleChat());
   };
 
   dispatchMessage(message) {
@@ -182,31 +167,19 @@ class Widget extends Component {
     }
   }
 
-  handleMessageSubmit = event => {
-    event.preventDefault();
-    const userUttered = event.target.message.value;
-    let userUtteredWithMails = userUttered;
+  /* <<<<<<<<<<<<<<<<<<<< Helper functions >>>>>>>>>>>>>>>>>>>> */
 
-    if (
-      event.target.message.mailInput !== undefined &&
-      event.target.message.mailInput !== ""
-    ) {
-      userUtteredWithMails = event.target.message.mailInput;
-    }
-
-    let cleanMessage = this.removeTags(userUttered);
-
-    event.target.message.value = "";
-
-    if (userUttered) {
-      const { sessionId } = this.state;
-
-      this.props.dispatch(addUserMessage(cleanMessage));
-      this.msgProxy
-        .sendMessage(userUtteredWithMails, sessionId, this.props.messageUrl)
-        .then(response => this.prepareForDispatch(response));
-    }
+  toggleConversation = () => {
+    this.props.dispatch(toggleChat());
   };
+
+  getSessionId() {
+    const { storage } = this.props;
+    const localSession = getLocalSession(storage, SESSION_NAME);
+
+    const local_id = localSession ? localSession.session_id : null;
+    return local_id;
+  }
 
   removeTags(input) {
     return input.replace(/@/g, "").replace(/\f/g, "");
@@ -231,6 +204,40 @@ class Widget extends Component {
     this.msgProxy
       .sendMessage(toSend, sessionId, this.props.messageUrl)
       .then(response => this.prepareForDispatch(response));
+  }
+
+  /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
+
+  componentDidMount() {
+    this.props.dispatch(pullSession());
+    this.props.dispatch(connectServer());
+
+    if (this.props.embedded && this.props.initialized) {
+      this.props.dispatch(showChat());
+      this.props.dispatch(openChat());
+    }
+
+    axios
+      .get(this.socketUrl + GET_TOKEN_FN)
+      .then(response => {
+        this.setState({
+          sessionId: response.data.session_id
+        });
+        this.trySendInitPayload();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    this.acProxy.fetchElements(this.props.listUrl, this.props.refreshPeriod);
+  }
+
+  componentDidUpdate() {
+    this.props.dispatch(pullSession());
+    if (this.props.embedded && this.props.initialized) {
+      this.props.dispatch(showChat());
+      this.props.dispatch(openChat());
+    }
   }
 
   render() {

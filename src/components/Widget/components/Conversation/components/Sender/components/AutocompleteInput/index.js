@@ -353,6 +353,10 @@ class AutocompleteInput extends Component {
     };
   }
 
+  deleteName(input, start, end) {
+    return input.substring(0, start) + input.substr(end + 1);
+  }
+
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
   // componentDidMount() {
