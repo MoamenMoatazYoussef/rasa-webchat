@@ -33,7 +33,6 @@ class AutocompleteInput extends Component {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onClick = this.onClick.bind(this);
-    // this.onSubmit = this.onSubmit.bind(this);
     this.onDelete = this.onDelete.bind(this);
 
     this.performNavigation = this.performNavigation.bind(this);
@@ -68,7 +67,6 @@ class AutocompleteInput extends Component {
 
     const i = event.target.selectionStart - 1;
     const newAutocompleteState = this.checkAutocomplete(event.target.value, i);
-     // (event.target.value.includes("@") && event.target.value[i] === "@");
 
     if (autocompleteState || newAutocompleteState) {
       this.setAutocompleteSelected(0);
@@ -86,7 +84,6 @@ class AutocompleteInput extends Component {
 
     const i = event.target.selectionStart - 1;
     const newAutocompleteState = this.checkAutocomplete(event.target.value, i);
-    // (event.target.value.includes("@") && event.target.value[i] === "@");
 
     const changed = event.target.value !== currentInput;
 
@@ -95,7 +92,6 @@ class AutocompleteInput extends Component {
       this.performAutocomplete(event, i);
     } else {
       if (event.keyCode === KEY_ENTER) {
-        // this.onSubmit(event);
         event.target.mailInput = replace(event.target.value, this.selectedStrings);
       } else {
         this.setCurrentInput(event.target.value);
@@ -152,13 +148,6 @@ class AutocompleteInput extends Component {
     this.setState({
       filteredList: []
     });
-  }
-
-  onSubmit(event) {
-    // event.target.mailInput = replace(
-    //   event.target.value, 
-    //   this.selectedStrings
-    // );
   }
 
   onDelete(event) {
@@ -359,10 +348,6 @@ class AutocompleteInput extends Component {
 
   /* <<<<<<<<<<<<<<<<<<<< Lifecycle methods >>>>>>>>>>>>>>>>>>>> */
 
-  // componentDidMount() {
-  //   this.fetchContacts();
-  // }
-
   componentDidUpdate() {
     if (this.activeItem) {
       this.activeItem.scrollIntoView({
@@ -391,7 +376,6 @@ class AutocompleteInput extends Component {
                   autoComplete="off"
                   onKeyUp={this.onKeyUp}
                   onKeyDown={this.onKeyDown}
-                  // onSubmit={() => this.onSubmit(this)}
                 />
               )}
             </Reference>
@@ -417,7 +401,7 @@ class AutocompleteInput extends Component {
                 }}
                 style={{ opacity: 1 }}
               >
-                {({ ref, style, placement, arrowProps }) => {
+                {({ ref, style, placement }) => {
                   return (
                     <div
                       ref={ref}

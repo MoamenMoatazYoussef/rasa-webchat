@@ -44,6 +44,4 @@
 
 ### Phase 4
 <!-- - Add "key" to button loop in custom component. -->
-- Create component List.js
-- Refactor Autocomplete: take List component outside.
 - Extract customComponent to outside configuration.

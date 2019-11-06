@@ -7,7 +7,7 @@ import AutocompleteInput from "./components/AutocompleteInput";
 import send from "assets/send_button.svg";
 import "./style.scss";
 
-const Sender = ({ sendMessage, inputFieldTextHint, disabledInput, listUrl, refreshPeriod }) => (
+const Sender = ({ sendMessage }) => (
   <form className="sender" onSubmit={sendMessage}>
     <AutocompleteInput
       autoFocus
